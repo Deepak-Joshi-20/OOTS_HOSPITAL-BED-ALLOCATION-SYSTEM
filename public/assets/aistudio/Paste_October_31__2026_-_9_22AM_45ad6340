@@ -1,0 +1,1090 @@
+# MASTER BUILD PROMPT
+# PROJECT: PREDICTIVE MAINTENANCE ANALYTICS SYSTEM
+## An Interactive Operating System-Based Industrial Monitoring & Resource Management Platform
+
+Act as a senior full-stack software engineer, UI/UX designer, system architect and Operating Systems specialist.
+
+Build a complete, polished, production-style web application named:
+
+**PREDICTIVE MAINTENANCE ANALYTICS SYSTEM**
+
+Tagline: *Understand machine health. Predict failures. Experience operating systems in action.*
+
+This is a university-level Operating Systems project. The application must combine an industrial predictive maintenance dashboard with interactive demonstrations of Operating System concepts.
+
+I do not want a static landing page, a simple CRUD application, or a collection of non-functional dashboard cards.
+
+I want a complete, responsive, beautifully designed and genuinely interactive website with realistic demo data, working navigation, functional controls, meaningful visualizations, interactive simulations and persistent application state.
+
+Build the actual application.
+
+---
+
+# 1. CORE VISION AND PROJECT IDENTITY
+
+Create an intelligent industrial equipment monitoring platform that allows users to:
+
+- Monitor the health of industrial machines.
+- Observe temperature, vibration, pressure and operating hours.
+- Identify machines that may require maintenance.
+- Calculate machine failure-risk scores.
+- View and prioritize maintenance alerts.
+- Monitor system processes and analysis threads.
+- Simulate CPU scheduling algorithms.
+- Understand process synchronization through a producer-consumer system.
+- Visualize mutexes, semaphores and critical sections.
+- Demonstrate inter-process communication.
+- Detect and prevent deadlocks.
+- Visualize memory allocation, paging and page replacement.
+- Review system logs, performance metrics and resource utilization.
+
+The central idea is that industrial machine readings enter a processing pipeline, are handled by concurrent processes and threads, are analyzed for risk, and finally produce maintenance alerts.
+
+The application must make the relationship between predictive maintenance and Operating System concepts easy to understand.
+
+**Important:** This is an educational software simulation. Do not claim that the application is connected to real industrial hardware, real sensors or a clinically/industrially validated AI prediction engine. Use simulated sensor streams and explain the methodology honestly.
+
+---
+
+# 2. TECHNOLOGY STACK
+
+Use the following stack:
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Lucide React icons
+- Recharts for charts and analytics
+- React Router for navigation
+- Framer Motion for subtle animations
+- LocalStorage or IndexedDB for persistent demo data
+
+Use clean component-based architecture.
+
+Keep application logic separate from UI components.
+
+Use TypeScript interfaces and well-organized modules.
+
+Avoid unnecessary dependencies.
+
+Do not use Python for the application.
+
+The application should run locally without requiring paid APIs, paid hosting or a mandatory external backend.
+
+If a backend is already configured, integrate with it without breaking the existing project. Otherwise, use a robust local persistence layer.
+
+Do not require users to connect a Google account.
+
+Do not enable paid cloud services, billing or external subscriptions automatically.
+
+---
+
+# 3. DESIGN SYSTEM — BEAUTIFUL, PREMIUM AND DISTINCTIVE
+
+The design is extremely important.
+
+I do not want a boring, generic admin dashboard or the usual dark hacker-style Operating System interface.
+
+Create a cheerful, sophisticated, modern light-mode design called:
+
+**ARCTIC BLOOM**
+
+### Colour palette
+
+Use these colours consistently:
+
+- Main background: #F8F7F3
+- Primary surface: #FFFFFF
+- Primary accent: #4169E1
+- Secondary blue: #63A4FF
+- Lavender: #E9E4FF
+- Lavender accent: #8B78DB
+- Coral: #FF806D
+- Peach: #FFE4D8
+- Main text: #252A36
+- Secondary text: #7C8495
+- Border: #E9EAF0
+
+**Strict colour rule: NO GREEN AND NO TEAL.**
+
+Use blue, lavender, coral, peach and neutral colours for all status indicators, charts and interactive elements.
+
+### Overall visual language
+
+The website should feel like a premium SaaS product with a thoughtful editorial design.
+
+Include:
+
+- A clean, spacious layout.
+- Beautiful typography with strong visual hierarchy.
+- Rounded cards with consistent radii.
+- Subtle shadows and delicate borders.
+- Soft pastel section backgrounds.
+- Carefully designed icons.
+- Beautiful empty states.
+- Smooth hover interactions.
+- Subtle transitions and animations.
+- Attractive data visualizations.
+- Consistent spacing and alignment.
+- A responsive sidebar and top navigation.
+
+Avoid:
+- Excessive gradients.
+- Neon colours.
+- Overcrowded dashboards.
+- Huge empty areas.
+- Too many unnecessary cards.
+- Generic template-like designs.
+- Excessive animations.
+- Randomly changing colours between pages.
+
+Use a cohesive design system throughout the entire application.
+
+The result should look like a polished software product rather than a student-made template.
+
+---
+
+# 4. APPLICATION STRUCTURE AND NAVIGATION
+
+Create a professional dashboard layout with:
+
+### Sidebar
+
+Include the following navigation sections:
+
+**OVERVIEW**
+1. Dashboard
+2. Machine Monitoring
+3. Maintenance Predictions
+4. Alerts Centre
+
+**OPERATING SYSTEM LAB**
+5. Process Management
+6. CPU Scheduling
+7. Synchronization Lab
+8. IPC Communication
+9. Deadlock Management
+10. Memory Management
+
+**SYSTEM**
+11. System Performance
+12. Event Logs
+13. Reports & Analytics
+14. Settings
+
+Each navigation item must open a genuinely implemented page.
+
+Use clear icons and active navigation states.
+
+The sidebar should be collapsible on desktop and transform into a mobile navigation drawer on smaller screens.
+
+### Top navigation
+
+Include:
+- Project name and logo.
+- Breadcrumb navigation.
+- Global search.
+- Notification icon.
+- System status indicator.
+- User profile menu.
+- Current date and time.
+
+Do not clutter the top navigation.
+
+---
+
+# 5. DASHBOARD
+
+Create an impressive dashboard that immediately communicates the state of the industrial monitoring system.
+
+### Main heading
+
+"Good morning, System Operator"
+
+Subtitle:
+"Here's what's happening across your monitored equipment."
+
+### KPI cards
+
+Display:
+
+1. Total Machines
+2. Healthy Machines
+3. Machines at Risk
+4. Critical Machines
+5. Active Processes
+6. Pending Maintenance Alerts
+
+Every metric must be calculated from actual application data.
+
+Do not hardcode dashboard numbers independently of the underlying records.
+
+### Main visualizations
+
+Create the following:
+
+**A. Machine Health Overview**
+
+A donut chart showing healthy, warning and critical machines.
+
+**B. Risk Trend**
+
+A line chart displaying machine risk scores over time.
+
+**C. Sensor Activity**
+
+A multi-series chart displaying temperature, vibration and pressure readings.
+
+**D. Maintenance Priority**
+
+A ranked list of machines requiring attention.
+
+**E. Live System Activity**
+
+A timeline showing:
+- New sensor readings.
+- Analysis process started.
+- Thread completed.
+- Risk score updated.
+- Maintenance alert generated.
+- Machine status changed.
+
+**F. OS Resource Overview**
+
+Display:
+- CPU utilization.
+- Memory utilization.
+- Active threads.
+- Buffer occupancy.
+- Pending jobs.
+
+Use visually attractive charts with tooltips, legends and meaningful labels.
+
+Include a small "System Simulation Running" indicator.
+
+---
+
+# 6. MACHINE MONITORING MODULE
+
+Build a full machine management interface.
+
+Each machine must have:
+
+- Machine ID.
+- Machine name.
+- Machine category.
+- Location.
+- Operational status.
+- Temperature.
+- Vibration level.
+- Pressure.
+- Running hours.
+- Last maintenance date.
+- Next scheduled maintenance.
+- Current risk score.
+- Risk category.
+
+Create realistic fictional industrial machines such as:
+
+- Hydraulic Press H-101
+- Conveyor Motor M-204
+- Cooling Pump P-310
+- Industrial Compressor C-402
+- CNC Machine CNC-115
+- Turbine Generator TG-08
+- Packaging Motor PM-220
+- Industrial Fan IF-120
+
+### Features
+
+- View all machines.
+- Search by machine ID or name.
+- Filter by status and risk level.
+- Sort by risk score.
+- Add a machine.
+- Edit machine details.
+- Remove a machine with confirmation.
+- Open a detailed machine profile.
+
+### Machine detail page
+
+Display:
+- Machine overview.
+- Sensor readings.
+- Historical readings.
+- Risk score history.
+- Maintenance history.
+- Related alerts.
+- Performance indicators.
+
+Include a simulated sensor update button.
+
+When clicked, generate a new reading and update the machine's data and risk calculation.
+
+---
+
+# 7. PREDICTIVE MAINTENANCE ENGINE
+
+Build an understandable, rule-based predictive risk engine.
+
+Do not pretend that a real machine-learning model has been trained.
+
+Create a configurable risk-scoring algorithm using:
+
+- Temperature deviation.
+- Vibration deviation.
+- Pressure deviation.
+- Operating hours.
+- Previous maintenance history.
+
+Normalize the readings and calculate a risk score from 0 to 100.
+
+Define:
+
+- 0–29: Low Risk
+- 30–59: Medium Risk
+- 60–79: High Risk
+- 80–100: Critical Risk
+
+Allow the user to inspect why a particular machine received its risk score.
+
+For example:
+
+"Machine H-101 has a high risk score because its vibration and operating temperature are above their configured thresholds."
+
+Show:
+- Risk score.
+- Risk category.
+- Contributing factors.
+- Recommended maintenance action.
+- Historical risk trend.
+
+Provide an explanation of the calculation so the system is transparent.
+
+The user should be able to adjust thresholds in Settings and see the risk calculations update.
+
+---
+
+# 8. MAINTENANCE PREDICTIONS AND ALERTS CENTRE
+
+Create a complete alert-management module.
+
+Alert categories:
+- Critical.
+- High.
+- Medium.
+- Low.
+
+Each alert should include:
+- Alert ID.
+- Machine.
+- Alert title.
+- Description.
+- Risk score.
+- Timestamp.
+- Priority.
+- Suggested action.
+- Current status.
+
+Features:
+- Search alerts.
+- Filter by priority.
+- Filter by machine.
+- Mark as acknowledged.
+- Resolve alerts.
+- View alert details.
+- Generate alerts when simulated readings cross configured thresholds.
+
+Sort alerts by priority and timestamp.
+
+Use clear status labels and attractive alert cards.
+
+---
+
+# 9. OPERATING SYSTEM LAB — THE MAIN DIFFERENTIATOR
+
+This is the most important section.
+
+Do not create static educational pages explaining OS concepts.
+
+Build actual interactive simulations that visually demonstrate how the Operating System concepts work inside the application.
+
+Each simulation must have:
+- A short explanation.
+- A visual representation.
+- Interactive controls.
+- A step-by-step execution mode.
+- A reset option.
+- A clear result or outcome.
+- A small explanation of what happened.
+
+The simulations must be connected to the predictive-maintenance processing pipeline.
+
+---
+
+# 10. PROCESS MANAGEMENT
+
+Create a Process Management dashboard.
+
+Represent the following processes:
+
+- Sensor Collector.
+- Log Filter.
+- Data Analyzer.
+- Risk Calculator.
+- Alert Generator.
+- Report Processor.
+
+Each process must display:
+
+- PID.
+- Process name.
+- Process state.
+- Priority.
+- CPU usage.
+- Memory usage.
+- Execution time.
+- Creation time.
+
+Process states:
+- New.
+- Ready.
+- Running.
+- Waiting.
+- Terminated.
+
+### Functional features
+
+- Start process.
+- Pause process.
+- Resume process.
+- Terminate process.
+- Restart process.
+- View process details.
+
+Show a visual process-state transition diagram.
+
+Demonstrate transitions between New, Ready, Running, Waiting and Terminated.
+
+When a process is started or terminated, update the process table and system activity log.
+
+Use simulated execution. Do not imply that the browser is managing actual operating-system processes.
+
+---
+
+# 11. CPU SCHEDULING SIMULATOR
+
+Build an interactive CPU Scheduling laboratory.
+
+Implement these algorithms:
+
+1. First Come First Serve (FCFS)
+2. Shortest Job First (SJF)
+3. Priority Scheduling
+4. Round Robin
+
+### Input
+
+Allow the user to create processes with:
+- Process ID.
+- Arrival time.
+- Burst time.
+- Priority.
+- Time quantum for Round Robin.
+
+Provide editable sample processes.
+
+### Output
+
+For each algorithm, calculate:
+
+- Completion time.
+- Turnaround time.
+- Waiting time.
+- Response time.
+- Average waiting time.
+- Average turnaround time.
+
+Display a Gantt chart showing execution order.
+
+Allow the user to select an algorithm and compare results.
+
+Add:
+- Run Simulation.
+- Step Forward.
+- Reset.
+- Compare Algorithms.
+
+Ensure that the calculations are mathematically correct.
+
+Explain the results in simple language.
+
+Make the Gantt chart attractive and readable.
+
+---
+
+# 12. SYNCHRONIZATION LAB — PRODUCER CONSUMER
+
+Create a visual Producer–Consumer simulation using a bounded buffer.
+
+This must be one of the most impressive interactive pages.
+
+### Simulation components
+
+- Producer threads.
+- Consumer threads.
+- Fixed-size buffer.
+- Mutex lock.
+- Empty semaphore.
+- Full semaphore.
+
+### Functionality
+
+Allow the user to:
+- Start producers.
+- Start consumers.
+- Pause execution.
+- Resume execution.
+- Reset the simulation.
+- Adjust buffer capacity.
+- Adjust producer speed.
+- Adjust consumer speed.
+
+Visualize items entering and leaving the buffer.
+
+Show:
+- Current buffer occupancy.
+- Empty slots.
+- Full slots.
+- Mutex status.
+- Semaphore counts.
+- Producer state.
+- Consumer state.
+
+### Synchronization rules
+
+- A producer must wait when the buffer is full.
+- A consumer must wait when the buffer is empty.
+- Only one thread can enter the critical section at a time.
+- Buffer operations must be protected by synchronization logic.
+
+Display an event log such as:
+
+"Producer P1 waiting for an empty slot."
+
+"Producer P1 acquired mutex."
+
+"Item inserted into buffer."
+
+"Consumer C1 acquired mutex."
+
+"Item consumed successfully."
+
+"Mutex released."
+
+Use a proper simulation state machine. Do not merely animate random items.
+
+The user must be able to understand why synchronization is necessary.
+
+---
+
+# 13. INTER-PROCESS COMMUNICATION
+
+Create an IPC Communication page demonstrating communication between:
+
+1. Log Collector Process
+2. Analyzer Process
+
+Use a simulated pipe-based communication model.
+
+### Visual layout
+
+Display two process panels connected through a pipe.
+
+The Log Collector generates machine readings and sends messages into the pipe.
+
+The Analyzer receives messages and processes them.
+
+Show:
+- Message queue.
+- Pipe capacity.
+- Messages sent.
+- Messages received.
+- Messages waiting.
+- Communication status.
+
+### Controls
+
+- Send message.
+- Start collector.
+- Start analyzer.
+- Pause communication.
+- Resume communication.
+- Reset.
+
+Show the message lifecycle from sender to receiver.
+
+Also explain the difference between processes and threads.
+
+The simulation should demonstrate that IPC allows separate processes to exchange information.
+
+---
+
+# 14. DEADLOCK MANAGEMENT
+
+Build an interactive Deadlock Management laboratory.
+
+Include:
+
+### A. Deadlock demonstration
+
+Create a simulation with multiple processes and resources.
+
+Allow processes to request and hold resources.
+
+Demonstrate the possibility of circular wait.
+
+Show:
+- Process-resource allocation graph.
+- Allocated resources.
+- Requested resources.
+- Available resources.
+- Waiting processes.
+
+### B. Banker’s Algorithm
+
+Implement the Banker's Algorithm correctly.
+
+Allow the user to configure:
+- Processes.
+- Resource types.
+- Allocation matrix.
+- Maximum demand matrix.
+- Available resources.
+
+Calculate the Need matrix:
+
+Need = Maximum - Allocation
+
+When the user requests resources, determine whether granting the request keeps the system in a safe state.
+
+Display:
+- Safe or unsafe state.
+- Safe sequence if one exists.
+- Remaining resources.
+- Explanation of the decision.
+
+Provide sample scenarios.
+
+Include a Reset Simulation option.
+
+### C. Deadlock prevention
+
+Explain the four necessary conditions:
+
+- Mutual Exclusion.
+- Hold and Wait.
+- No Preemption.
+- Circular Wait.
+
+Show how fixed resource ordering can prevent circular wait.
+
+Do not claim that a system is deadlock-free simply because one simulation completed successfully.
+
+---
+
+# 15. MEMORY MANAGEMENT LAB
+
+Build an interactive Memory Management page.
+
+Include the following modules:
+
+### A. Memory Allocation
+
+Show a visual representation of memory divided into blocks or frames.
+
+Display:
+- Total memory.
+- Used memory.
+- Free memory.
+- Process allocation.
+- Memory utilization.
+
+Allow the user to allocate and release memory for simulated processes.
+
+### B. Paging
+
+Demonstrate:
+- Logical address.
+- Page number.
+- Offset.
+- Page table.
+- Physical frame.
+
+Allow the user to enter a logical address and see its translation.
+
+### C. Page Replacement Algorithms
+
+Implement:
+
+1. FIFO
+2. LRU
+
+Allow the user to:
+- Enter a page-reference string.
+- Select the number of frames.
+- Run the algorithm.
+- Step through execution.
+
+Display:
+- Frame contents at each step.
+- Page hits.
+- Page faults.
+- Total page faults.
+- Hit ratio.
+- Replacement history.
+
+Ensure both algorithms calculate correct results.
+
+### D. Working Set and Thrashing
+
+Provide a simple simulation explaining working-set size and memory pressure.
+
+Show how excessive concurrent analysis threads can increase memory pressure.
+
+Do not invent real hardware measurements; use clearly labelled simulated values.
+
+---
+
+# 16. SYSTEM PERFORMANCE
+
+Build a beautiful system performance dashboard.
+
+Show simulated:
+
+- CPU utilization.
+- Memory usage.
+- Active processes.
+- Active threads.
+- Buffer occupancy.
+- Processing throughput.
+- Average processing time.
+- Pending analysis jobs.
+
+Use attractive charts and historical trends.
+
+Add a simulation control to increase incoming sensor data and observe how the workload affects the processing pipeline.
+
+Explain that these are application-level simulation metrics, not direct measurements of the user's physical computer.
+
+---
+
+# 17. EVENT LOGS
+
+Create a searchable system event log.
+
+Each event should include:
+
+- Timestamp.
+- Event ID.
+- Source process.
+- Event category.
+- Description.
+- Severity.
+
+Example events:
+
+- Sensor reading received.
+- Data validation completed.
+- Producer entered critical section.
+- Buffer item inserted.
+- Analyzer consumed reading.
+- Risk score calculated.
+- Maintenance alert generated.
+- Process terminated.
+- Page fault occurred.
+- Resource request denied.
+
+Features:
+- Search.
+- Filter.
+- Sort.
+- Date range.
+- Event details.
+- Export logs as CSV.
+
+Make the event log update when simulations are run.
+
+---
+
+# 18. REPORTS AND ANALYTICS
+
+Create a professional reporting module.
+
+Include:
+
+- Machine health summary.
+- Risk distribution.
+- Maintenance alert statistics.
+- Sensor trends.
+- CPU scheduling comparison.
+- Producer-consumer throughput.
+- Memory utilization.
+- Page fault comparison.
+- Process execution statistics.
+
+Allow users to select date ranges and export reports.
+
+Include CSV export and a print-friendly report layout.
+
+Do not display fabricated measurement results as actual hardware performance.
+
+---
+
+# 19. SETTINGS
+
+Create a complete settings page.
+
+Include:
+
+- User profile preferences.
+- Theme preferences.
+- Notification preferences.
+- Machine risk thresholds.
+- Sensor simulation settings.
+- Buffer capacity.
+- Process simulation settings.
+- CPU scheduling defaults.
+- Memory simulation settings.
+- Demo data management.
+
+Provide a **Load Demo Data**, **Reset Demo Data** and **Clear Demo Data** option with confirmation dialogs.
+
+Demo records must be identifiable as fictional sample data.
+
+Never silently overwrite existing user-created records.
+
+---
+
+# 20. DEMO DATA — THE APPLICATION MUST NOT OPEN EMPTY
+
+The website must be populated immediately when launched for the first time.
+
+Create a realistic fictional industrial environment with:
+
+- 12–18 machines.
+- At least 30 historical sensor readings.
+- 8–12 maintenance alerts.
+- 6–10 maintenance records.
+- Multiple simulated processes.
+- Multiple producer and consumer threads.
+- Sample CPU scheduling processes.
+- Sample memory reference strings.
+- Sample deadlock scenarios.
+- A realistic event log.
+
+Include a mixture of:
+- Healthy machines.
+- Machines with warning-level readings.
+- High-risk machines.
+- Critical machines.
+- Recently maintained machines.
+
+Make the sample dataset internally consistent.
+
+The dashboard statistics must be calculated from the actual dataset.
+
+All tables, charts, filters, machine profiles, alerts and analytics must use the same underlying data.
+
+Use fictional data only.
+
+Seed demo data once. Do not create duplicate entries every time the page reloads.
+
+Persist application changes after browser refresh.
+
+The simulations must also work independently with editable input values.
+
+---
+
+# 21. INTERACTIVE EXPERIENCE
+
+The website must not feel like a static report.
+
+Every important control should work.
+
+Examples:
+
+- Clicking a machine opens its details.
+- Changing a sensor reading recalculates risk.
+- Generating a high-risk reading creates an alert.
+- Resolving an alert updates its status.
+- Starting a process updates the process table.
+- Running CPU scheduling generates a Gantt chart and metrics.
+- Starting producers and consumers updates buffer contents and semaphore counts.
+- Sending an IPC message updates the communication queue.
+- Running the Banker's Algorithm produces a safe or unsafe result.
+- Running page replacement updates frames and page-fault counts.
+- Export buttons generate actual files.
+
+Add useful loading states, confirmation dialogs, success notifications and error messages.
+
+Do not create decorative controls that do nothing.
+
+---
+
+# 22. RESPONSIVENESS AND ACCESSIBILITY
+
+Ensure that the complete application works on:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+Use responsive layouts and appropriate breakpoints.
+
+Ensure:
+- Readable text.
+- Sufficient contrast.
+- Keyboard-accessible controls.
+- Proper labels.
+- Clear focus states.
+- Accessible chart descriptions where practical.
+
+Do not allow tables or charts to overflow their containers.
+
+---
+
+# 23. CODE QUALITY AND ARCHITECTURE
+
+Organize the application into reusable components.
+
+Suggested structure:
+
+src/
+  components/
+    layout/
+    dashboard/
+    charts/
+    machines/
+    alerts/
+    simulations/
+    common/
+
+  pages/
+    Dashboard.tsx
+    MachineMonitoring.tsx
+    MachineDetails.tsx
+    Predictions.tsx
+    Alerts.tsx
+    ProcessManagement.tsx
+    CPUScheduling.tsx
+    SynchronizationLab.tsx
+    IPCCommunication.tsx
+    DeadlockManagement.tsx
+    MemoryManagement.tsx
+    SystemPerformance.tsx
+    EventLogs.tsx
+    Reports.tsx
+    Settings.tsx
+
+  simulation/
+    cpuScheduling/
+    producerConsumer/
+    ipc/
+    bankerAlgorithm/
+    memoryManagement/
+
+  services/
+    riskEngine.ts
+    machineService.ts
+    alertService.ts
+    persistenceService.ts
+
+  types/
+  hooks/
+  utils/
+
+You may improve this structure if necessary.
+
+Use separate modules for:
+- Business logic.
+- Simulation algorithms.
+- Data persistence.
+- UI components.
+- Chart configuration.
+
+Avoid giant single-file components.
+
+Do not use placeholder pages.
+
+Do not leave TODO comments instead of implementing features.
+
+---
+
+# 24. TESTING AND CORRECTNESS
+
+Verify the actual functionality of the important algorithms.
+
+Test cases should include:
+
+- CPU scheduling calculations.
+- Round Robin execution.
+- Producer-consumer buffer overflow and underflow prevention.
+- Mutex mutual exclusion.
+- Semaphore counts.
+- IPC message delivery.
+- Banker's Algorithm safe and unsafe cases.
+- FIFO page replacement.
+- LRU page replacement.
+- Risk-score calculations.
+- Alert generation.
+- Data persistence.
+
+Prevent invalid inputs from crashing the application.
+
+Show clear validation errors.
+
+---
+
+# 25. FINAL ACCEPTANCE CRITERIA
+
+Before considering the project complete, verify every item:
+
+1. The website launches successfully.
+2. The first screen is a fully populated dashboard.
+3. Navigation works across every module.
+4. Every page has a complete and consistent design.
+5. The machine-monitoring features work.
+6. Risk scores recalculate correctly.
+7. Alerts are generated and can be managed.
+8. Process states can be changed.
+9. CPU scheduling algorithms produce correct calculations.
+10. Producer-consumer synchronization works.
+11. IPC communication works.
+12. Banker's Algorithm produces correct safe-state results.
+13. Paging and page replacement work.
+14. System logs reflect user actions and simulations.
+15. Charts use real application data.
+16. Demo data persists after refreshing.
+17. Export features generate actual files.
+18. The website is responsive.
+19. There are no broken buttons, placeholder pages or dead navigation links.
+20. The entire application follows the Arctic Bloom design system.
+
+## MOST IMPORTANT BUILD INSTRUCTIONS
+
+- Build the complete application, not just the dashboard.
+- Do not stop after generating the first screen.
+- Do not replace functional modules with static illustrations.
+- Do not make the Operating System section a collection of text explanations.
+- Implement the underlying algorithms and make their results visible.
+- Use simulated data where real industrial hardware is unavailable.
+- Keep all modules visually consistent.
+- Make the website feel like a premium industrial monitoring and OS-learning product.
+- Prioritize correctness, visual quality, usability and a convincing live demonstration.
+
+If the implementation is too large for one generation pass, build it in logical phases while preserving the same architecture and design system. Complete each module before moving on, and do not break already implemented functionality.
+
+**FINAL GOAL: Deliver a beautiful, fully functional, interactive Predictive Maintenance Analytics System that demonstrates Operating System concepts through working simulations and can be confidently presented as a complete BTech CSE Operating Systems project.**

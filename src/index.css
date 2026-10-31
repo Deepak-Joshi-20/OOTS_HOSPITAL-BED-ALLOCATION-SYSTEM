@@ -1,0 +1,535 @@
+@import "tailwindcss";
+
+@layer base {
+  :root,
+  html[data-theme="blossom"] {
+    --bc-vanilla: #FAF1E8;
+    --bc-blush: #F5E9E8;
+    --bc-rose: #D9B9C8;
+    --bc-mauve: #B98CA7;
+    --bc-lilac: #B9A5D5;
+    --bc-lavender: #EAE2F3;
+    --bc-peach: #E9B9A7;
+    --bc-berry: #754C68;
+    --bc-charcoal: #2E2532;
+    --app-bg: #FAF1E8;
+    --app-text: #2E2532;
+    --app-scroll-track: #FAF1E8;
+    --app-scroll-thumb: #C9A9B8;
+    --app-scroll-hover: #754C68;
+  }
+
+  html[data-theme="luxe"] {
+    --app-bg: #E9EFF8;
+    --app-text: #1A2130;
+    --app-scroll-track: #E9EFF8;
+    --app-scroll-thumb: #9FB2D4;
+    --app-scroll-hover: #2E56D6;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html[data-theme="blossom"] h1,
+  html[data-theme="blossom"] h2,
+  html[data-theme="blossom"] .font-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+
+  html[data-theme="blossom"] h3,
+  html[data-theme="blossom"] h4,
+  html[data-theme="blossom"] .font-display {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.015em;
+  }
+
+  html[data-theme="luxe"] h1,
+  html[data-theme="luxe"] h2,
+  html[data-theme="luxe"] h3,
+  html[data-theme="luxe"] h4,
+  html[data-theme="luxe"] .font-display,
+  html[data-theme="luxe"] .font-editorial {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-mono,
+  .tabular-nums {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* High-contrast placeholders & form controls across all pages */
+  input::placeholder,
+  textarea::placeholder {
+    color: #4E5B78 !important;
+    opacity: 1 !important;
+  }
+
+  html[data-theme="blossom"] input::placeholder,
+  html[data-theme="blossom"] textarea::placeholder {
+    color: #634F5E !important;
+    opacity: 1 !important;
+  }
+
+  input,
+  select,
+  textarea {
+    color: #1A2130;
+  }
+
+  html[data-theme="blossom"] input,
+  html[data-theme="blossom"] select,
+  html[data-theme="blossom"] textarea {
+    color: #2E2532;
+  }
+
+  /* Visible focus indicators for keyboard & pointer accessibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #2E56D6;
+    outline-offset: 2px;
+  }
+
+  html[data-theme="blossom"] button:focus-visible,
+  html[data-theme="blossom"] a:focus-visible,
+  html[data-theme="blossom"] input:focus-visible,
+  html[data-theme="blossom"] select:focus-visible,
+  html[data-theme="blossom"] textarea:focus-visible {
+    outline: 2px solid #754C68;
+    outline-offset: 2px;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled {
+    opacity: 0.52 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+/* ============================================================================
+   1. ARCTIC BLOOM (LUXE) WCAG AA CONTRAST ENFORCEMENT
+   ============================================================================ */
+
+/* Primary dark headings & body text on light cards */
+html:not([data-theme="blossom"]) .text-\[\#252D43\],
+html:not([data-theme="blossom"]) .text-\[\#252A36\] {
+  color: #1A2130;
+}
+
+/* Secondary & caption text on light cards (WCAG AA >= 6.4:1 contrast) */
+html:not([data-theme="blossom"]) .text-\[\#7C8495\],
+html:not([data-theme="blossom"]) .text-\[\#7F8CA8\],
+html:not([data-theme="blossom"]) .text-\[\#6E7A99\],
+html:not([data-theme="blossom"]) .text-\[\#5A6582\] {
+  color: #414C66;
+}
+
+/* Royal blue text on light surfaces (WCAG AA >= 5.5:1) */
+html:not([data-theme="blossom"]) .text-\[\#4169E1\],
+html:not([data-theme="blossom"]) .text-\[\#3358D4\] {
+  color: #2850C8;
+}
+
+/* Sky/Electric blue text: dark royal-sky on light surfaces, bright sky on dark surfaces */
+html:not([data-theme="blossom"]) .text-\[\#619BFF\],
+html:not([data-theme="blossom"]) .text-\[\#63A4FF\] {
+  color: #2450C8;
+}
+
+html:not([data-theme="blossom"]) .from-\[\#111A35\] .text-\[\#619BFF\],
+html:not([data-theme="blossom"]) .from-\[\#202B52\] .text-\[\#619BFF\],
+html:not([data-theme="blossom"]) .bg-\[\#111A35\] .text-\[\#619BFF\],
+html:not([data-theme="blossom"]) .bg-\[\#202B52\] .text-\[\#619BFF\],
+html:not([data-theme="blossom"]) aside .text-\[\#619BFF\] {
+  color: #8AB4FF;
+}
+
+/* Lavender/Violet text: deep royal violet on light/lavender surfaces, bright lavender on dark surfaces */
+html:not([data-theme="blossom"]) .text-\[\#8B78DB\],
+html:not([data-theme="blossom"]) .text-\[\#8975D5\],
+html:not([data-theme="blossom"]) .text-\[\#6B54C4\],
+html:not([data-theme="blossom"]) .text-\[\#5B45B0\] {
+  color: #523B9E;
+}
+
+html:not([data-theme="blossom"]) .from-\[\#111A35\] .text-\[\#8975D5\],
+html:not([data-theme="blossom"]) .from-\[\#202B52\] .text-\[\#8975D5\],
+html:not([data-theme="blossom"]) .bg-\[\#111A35\] .text-\[\#8975D5\],
+html:not([data-theme="blossom"]) .bg-\[\#202B52\] .text-\[\#8975D5\] {
+  color: #CFC6FF;
+}
+
+/* Coral/Peach text: deep crimson-coral (#C4382B) on light/peach surfaces, warm bright coral on dark surfaces */
+html:not([data-theme="blossom"]) .text-\[\#FF806D\],
+html:not([data-theme="blossom"]) .text-\[\#FF8278\],
+html:not([data-theme="blossom"]) .text-\[\#D94E43\],
+html:not([data-theme="blossom"]) .text-\[\#C03C32\] {
+  color: #C4382B;
+}
+
+html:not([data-theme="blossom"]) .from-\[\#111A35\] .text-\[\#FF8278\],
+html:not([data-theme="blossom"]) .from-\[\#202B52\] .text-\[\#FF8278\],
+html:not([data-theme="blossom"]) .bg-\[\#111A35\] .text-\[\#FF8278\],
+html:not([data-theme="blossom"]) .bg-\[\#202B52\] .text-\[\#FF8278\],
+html:not([data-theme="blossom"]) aside .text-\[\#FF8278\] {
+  color: #FF9E94;
+}
+
+/* Subtitle/icon muted blue (#A5B4D4): high-contrast slate on light cards, crisp ice-blue on dark headers */
+html:not([data-theme="blossom"]) .text-\[\#A5B4D4\] {
+  color: #414C66;
+}
+
+html:not([data-theme="blossom"]) .from-\[\#111A35\] .text-\[\#A5B4D4\],
+html:not([data-theme="blossom"]) .from-\[\#202B52\] .text-\[\#A5B4D4\],
+html:not([data-theme="blossom"]) .bg-\[\#111A35\] .text-\[\#A5B4D4\],
+html:not([data-theme="blossom"]) .bg-\[\#202B52\] .text-\[\#A5B4D4\] {
+  color: #DCE6FA;
+}
+
+/* Strengthen subtle borders in Arctic Bloom so cards, inputs, and tables are crisp */
+html:not([data-theme="blossom"]) .border-\[\#E9EAF0\],
+html:not([data-theme="blossom"]) .border-\[\#D5E0F2\],
+html:not([data-theme="blossom"]) .border-\[\#E2E9F5\] {
+  border-color: #C5D3EB;
+}
+
+/* ============================================================================
+   2. BLOSSOM CARE PALETTE HARMONIZATION & WCAG AA CONTRAST ENFORCEMENT
+   ============================================================================ */
+
+/* Light canvas & pastel card surfaces */
+html[data-theme="blossom"] .bg-\[\#E9EFF8\],
+html[data-theme="blossom"] .bg-\[\#F4F7FC\],
+html[data-theme="blossom"] .bg-\[\#F8FAFE\],
+html[data-theme="blossom"] .bg-\[\#F8F7F3\] {
+  background-color: #FAF1E8 !important;
+}
+
+html[data-theme="blossom"] .bg-\[\#E9EFF8\]\/75,
+html[data-theme="blossom"] .bg-\[\#E9EFF8\]\/70,
+html[data-theme="blossom"] .bg-\[\#E9EFF8\]\/65,
+html[data-theme="blossom"] .bg-\[\#E9EFF8\]\/60,
+html[data-theme="blossom"] .bg-\[\#E9EFF8\]\/45 {
+  background-color: #F5E9E8 !important;
+}
+
+html[data-theme="blossom"] .bg-\[\#E8E4FF\],
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/75,
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/65,
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/60,
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/55,
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/45,
+html[data-theme="blossom"] .bg-\[\#E8E4FF\]\/35,
+html[data-theme="blossom"] .bg-\[\#E9E4FF\],
+html[data-theme="blossom"] .bg-\[\#E9E4FF\]\/60,
+html[data-theme="blossom"] .bg-\[\#E9E4FF\]\/50,
+html[data-theme="blossom"] .bg-\[\#E9E4FF\]\/35 {
+  background-color: #EAE2F3 !important;
+}
+
+html[data-theme="blossom"] .bg-\[\#FFE3D9\],
+html[data-theme="blossom"] .bg-\[\#FFE3D9\]\/70,
+html[data-theme="blossom"] .bg-\[\#FFE3D9\]\/65,
+html[data-theme="blossom"] .bg-\[\#FFE3D9\]\/55,
+html[data-theme="blossom"] .bg-\[\#FFE3D9\]\/50,
+html[data-theme="blossom"] .bg-\[\#FFE3D9\]\/45,
+html[data-theme="blossom"] .bg-\[\#FFE4D8\],
+html[data-theme="blossom"] .bg-\[\#FFE4D8\]\/60 {
+  background-color: #F5E9E8 !important;
+}
+
+/* ============================================================================
+   BLOSSOM CARE PAGE BANNERS, GRADIENTS & ACTION BUTTONS
+   Note: In Tailwind CSS v4, --tw-gradient-from / --tw-gradient-via / --tw-gradient-to
+   are registered with syntax: "<color>". Never append var(--tw-gradient-*-position)
+   or the browser resets the gradient to #0000 (transparent)!
+   ============================================================================ */
+
+/* Page heading banners & former dark navy gradient surfaces in Blossom Care:
+   Use a soft, light translucent Blossom surface so the decorative hospital illustration
+   remains visible behind the banner, while headings use dark charcoal plum (#3D3440)
+   and subtitles use readable muted plum (#564552). */
+html[data-theme="blossom"] .from-\[\#111A35\],
+html[data-theme="blossom"] .from-\[\#202B52\] {
+  --tw-gradient-from: rgba(245, 233, 232, 0.86) !important;
+  --tw-gradient-via: rgba(255, 253, 251, 0.92) !important;
+  --tw-gradient-to: rgba(234, 226, 243, 0.86) !important;
+  background-color: rgba(250, 241, 232, 0.88) !important;
+  border: 1px solid #D9B9C8 !important;
+  color: #3D3440 !important;
+}
+
+html[data-theme="blossom"] .via-\[\#202B52\] {
+  --tw-gradient-via: rgba(255, 253, 251, 0.92) !important;
+}
+
+html[data-theme="blossom"] .to-\[\#202B52\],
+html[data-theme="blossom"] .to-\[\#263566\],
+html[data-theme="blossom"] .to-\[\#2B3B70\],
+html[data-theme="blossom"] .to-\[\#111A35\] {
+  --tw-gradient-to: rgba(234, 226, 243, 0.86) !important;
+}
+
+/* Primary action gradients (progress bars, Confirm Bed Allocation, Smart Bed Matcher, etc.) */
+html[data-theme="blossom"] .from-\[\#4169E1\] {
+  --tw-gradient-from: #754C68 !important;
+}
+
+html[data-theme="blossom"] .to-\[\#619BFF\],
+html[data-theme="blossom"] .to-\[\#8975D5\] {
+  --tw-gradient-to: #9E6B8B !important;
+}
+
+/* Solid dark navy buttons/badges/table headers become Berry Plum (#754C68) with white text */
+html[data-theme="blossom"] .bg-\[\#111A35\],
+html[data-theme="blossom"] .bg-\[\#202B52\],
+html[data-theme="blossom"] .bg-\[\#4169E1\],
+html[data-theme="blossom"] .bg-\[\#2E56D6\] {
+  background-color: #754C68 !important;
+  color: #FAF1E8 !important;
+}
+
+html[data-theme="blossom"] .hover\:bg-\[\#3358D4\]:hover,
+html[data-theme="blossom"] .hover\:bg-\[\#3256C9\]:hover,
+html[data-theme="blossom"] .hover\:bg-\[\#3457c9\]:hover,
+html[data-theme="blossom"] .hover\:bg-\[\#2344B5\]:hover,
+html[data-theme="blossom"] .hover\:bg-\[\#202B52\]:hover,
+html[data-theme="blossom"] .hover\:bg-\[\#111A35\]:hover {
+  background-color: #5E3B53 !important;
+  color: #FAF1E8 !important;
+}
+
+html[data-theme="blossom"] .bg-\[\#8975D5\],
+html[data-theme="blossom"] .bg-\[\#8B78DB\],
+html[data-theme="blossom"] .bg-\[\#5641A6\] {
+  background-color: #6B4782 !important;
+}
+
+html[data-theme="blossom"] .bg-\[\#FF8278\],
+html[data-theme="blossom"] .bg-\[\#FF806D\],
+html[data-theme="blossom"] .bg-\[\#C4382B\] {
+  background-color: #B3392F !important;
+}
+
+/* Light-Surface Text & Typography Colors in Blossom Care (WCAG AA >= 6:1) */
+html[data-theme="blossom"] .text-\[\#252D43\],
+html[data-theme="blossom"] .text-\[\#252A36\],
+html[data-theme="blossom"] .text-\[\#202B52\],
+html[data-theme="blossom"] .text-\[\#1A2130\],
+html[data-theme="blossom"] .text-\[\#3D3440\] {
+  color: #3D3440 !important;
+}
+
+html[data-theme="blossom"] .text-\[\#5A6582\],
+html[data-theme="blossom"] .text-\[\#6E7A99\],
+html[data-theme="blossom"] .text-\[\#7F8CA8\],
+html[data-theme="blossom"] .text-\[\#7C8495\],
+html[data-theme="blossom"] .text-\[\#786675\],
+html[data-theme="blossom"] .text-\[\#414C66\],
+html[data-theme="blossom"] .text-\[\#665663\],
+html[data-theme="blossom"] .text-\[\#A5B4D4\],
+html[data-theme="blossom"] .text-\[\#DCE6FA\] {
+  color: #564552 !important;
+}
+
+html[data-theme="blossom"] .text-\[\#4169E1\],
+html[data-theme="blossom"] .text-\[\#3358D4\],
+html[data-theme="blossom"] .text-\[\#2851C7\],
+html[data-theme="blossom"] .text-\[\#2850C8\],
+html[data-theme="blossom"] .text-\[\#2450C8\],
+html[data-theme="blossom"] .text-\[\#619BFF\],
+html[data-theme="blossom"] .text-\[\#63A4FF\],
+html[data-theme="blossom"] .text-\[\#8AB4FF\] {
+  color: #754C68 !important;
+}
+
+html[data-theme="blossom"] .text-\[\#8975D5\],
+html[data-theme="blossom"] .text-\[\#8B78DB\],
+html[data-theme="blossom"] .text-\[\#6B54C4\],
+html[data-theme="blossom"] .text-\[\#5B45B0\],
+html[data-theme="blossom"] .text-\[\#523B9E\] {
+  color: #633D7D !important;
+}
+
+html[data-theme="blossom"] .text-\[\#FF8278\],
+html[data-theme="blossom"] .text-\[\#FF806D\],
+html[data-theme="blossom"] .text-\[\#D94E43\],
+html[data-theme="blossom"] .text-\[\#C03C32\],
+html[data-theme="blossom"] .text-\[\#C4382B\],
+html[data-theme="blossom"] .text-\[\#B83227\],
+html[data-theme="blossom"] .text-\[\#FF9E94\] {
+  color: #A8362B !important;
+}
+
+/* ============================================================================
+   PAGE BANNER (.from-[#111A35]) CHILD ELEMENT VISIBILITY IN BLOSSOM CARE
+   Ensures headings, subtitles, pills, KPI boxes, and buttons inside page
+   heading banners are crisp and readable against the light Blossom banner.
+   ============================================================================ */
+html[data-theme="blossom"] .from-\[\#111A35\] h1,
+html[data-theme="blossom"] .from-\[\#111A35\] h2,
+html[data-theme="blossom"] .from-\[\#111A35\] h3 {
+  color: #3D3440 !important;
+}
+
+html[data-theme="blossom"] .from-\[\#111A35\] p,
+html[data-theme="blossom"] .from-\[\#111A35\] .text-\[\#E8E4FF\]\/80,
+html[data-theme="blossom"] .from-\[\#111A35\] .text-white\/85,
+html[data-theme="blossom"] .from-\[\#111A35\] .text-\[\#A5B4D4\],
+html[data-theme="blossom"] .from-\[\#111A35\] .text-\[\#DCE6FA\] {
+  color: #564552 !important;
+}
+
+/* Badges, secondary buttons, and stat boxes inside Blossom Care page banners */
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-white\/10,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-white\/15,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-white\/20,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-black\/20,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-\[\#4169E1\]\/25,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-\[\#8975D5\]\/25,
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-\[\#FF8278\]\/20 {
+  background-color: #FFFDFB !important;
+  border-color: #D9B9C8 !important;
+  color: #754C68 !important;
+}
+
+html[data-theme="blossom"] .from-\[\#111A35\] button.bg-white\/10,
+html[data-theme="blossom"] .from-\[\#111A35\] button.bg-white\/15 {
+  background-color: #FFFDFB !important;
+  border: 1px solid #C9A9B8 !important;
+  color: #3D3440 !important;
+}
+
+html[data-theme="blossom"] .from-\[\#111A35\] button.bg-white\/10:hover,
+html[data-theme="blossom"] .from-\[\#111A35\] button.bg-white\/15:hover {
+  background-color: #F5E9E8 !important;
+  border-color: #754C68 !important;
+}
+
+/* Primary action buttons inside Blossom Care page banners stay Berry Plum with white text */
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-\[\#4169E1\],
+html[data-theme="blossom"] .from-\[\#111A35\] .from-\[\#4169E1\] {
+  background-color: #754C68 !important;
+  color: #FAF1E8 !important;
+}
+
+html[data-theme="blossom"] .from-\[\#111A35\] .bg-\[\#4169E1\] *,
+html[data-theme="blossom"] .from-\[\#111A35\] .from-\[\#4169E1\] * {
+  color: #FAF1E8 !important;
+}
+
+/* Sidebar icons in Blossom Care remain warm peach/lavender on the Berry Plum sidebar */
+html[data-theme="blossom"] aside .text-\[\#619BFF\] {
+  color: #EAE2F3 !important;
+}
+
+/* Borders & Dividers in Blossom Care */
+html[data-theme="blossom"] .border-\[\#D5E0F2\],
+html[data-theme="blossom"] .border-\[\#E9EAF0\],
+html[data-theme="blossom"] .border-\[\#E2E9F5\],
+html[data-theme="blossom"] .border-\[\#B8C7E0\] {
+  border-color: #C9A9B8 !important;
+}
+
+html[data-theme="blossom"] .divide-\[\#E9EFF8\] > :not(:last-child),
+html[data-theme="blossom"] .divide-\[\#E9EAF0\] > :not(:last-child),
+html[data-theme="blossom"] .divide-\[\#E2E9F5\] > :not(:last-child) {
+  border-color: #DEC8D2 !important;
+}
+
+/* ============================================================================
+   3. RECHARTS AXES, LEGENDS & TOOLTIPS GLOBAL READABILITY
+   ============================================================================ */
+.recharts-cartesian-axis-tick-value tspan {
+  fill: #3B455E;
+  font-weight: 600;
+}
+
+html[data-theme="blossom"] .recharts-cartesian-axis-tick-value tspan {
+  fill: #4A3B47;
+  font-weight: 600;
+}
+
+.recharts-legend-item-text {
+  color: #1A2130 !important;
+  font-weight: 600;
+}
+
+html[data-theme="blossom"] .recharts-legend-item-text {
+  color: #2E2532 !important;
+  font-weight: 600;
+}
+
+.recharts-default-tooltip {
+  background-color: #111A35 !important;
+  border: 1px solid #4169E1 !important;
+  border-radius: 12px !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px -5px rgba(17, 26, 53, 0.35) !important;
+}
+
+html[data-theme="blossom"] .recharts-default-tooltip {
+  background-color: #2E2532 !important;
+  border: 1px solid #B98CA7 !important;
+  color: #FAF1E8 !important;
+  box-shadow: 0 10px 25px -5px rgba(46, 37, 50, 0.35) !important;
+}
+
+.recharts-tooltip-label {
+  color: #9CC2FF !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+html[data-theme="blossom"] .recharts-tooltip-label {
+  color: #E9B9A7 !important;
+  font-weight: 700 !important;
+}
+
+.recharts-tooltip-item {
+  color: #F4F7FC !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="blossom"] .recharts-tooltip-item {
+  color: #FAF1E8 !important;
+  font-weight: 600 !important;
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--app-scroll-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--app-scroll-thumb);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-scroll-hover);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+  }
+}

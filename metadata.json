@@ -1,0 +1,6 @@
+{
+  "name": "Predictive Maintenance Analytics System",
+  "description": "An interactive Operating System-based industrial monitoring, predictive maintenance, and resource management platform featuring live OS algorithm simulations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
