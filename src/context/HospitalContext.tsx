@@ -2,27 +2,44 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import {
   AcuityLevel,
   AdmissionRecord,
+  AppointmentStatus,
   BedStatus,
   DischargeRecord,
+  DoctorAvailability,
+  DoctorProfile,
+  EquipmentAvailability,
+  EquipmentCondition,
+  HospitalAppointment,
   HospitalAuditLog,
   HospitalBed,
+  HospitalDepartment,
+  HospitalFacilitySettings,
+  HospitalInvoice,
   HospitalWard,
+  MedicalEquipment,
   PatientRecord,
+  PaymentStatus,
   WaitingQueueItem,
   WardType,
 } from '../types/hospital';
 import {
   INITIAL_ADMISSIONS,
+  INITIAL_APPOINTMENTS,
   INITIAL_BEDS,
+  INITIAL_DEPARTMENTS,
   INITIAL_DISCHARGES,
+  INITIAL_DOCTORS,
+  INITIAL_EQUIPMENT,
+  INITIAL_FACILITY_SETTINGS,
   INITIAL_HOSPITAL_AUDIT_LOGS,
+  INITIAL_INVOICES,
   INITIAL_PATIENTS,
   INITIAL_WAITING_QUEUE,
   INITIAL_WARDS,
 } from '../services/hospitalDemoData';
 import { useAuth } from './AuthContext';
 
-const HOSPITAL_STORAGE_KEY = 'luxe_medical_hospital_state_v1';
+const HOSPITAL_STORAGE_KEY = 'blossom_care_hospital_hms_state_v2';
 
 interface HospitalContextType {
   wards: HospitalWard[];
@@ -32,12 +49,38 @@ interface HospitalContextType {
   admissions: AdmissionRecord[];
   discharges: DischargeRecord[];
   auditLogs: HospitalAuditLog[];
-  // Operations
+  doctors: DoctorProfile[];
+  appointments: HospitalAppointment[];
+  departments: HospitalDepartment[];
+  invoices: HospitalInvoice[];
+  equipment: MedicalEquipment[];
+  facilitySettings: HospitalFacilitySettings;
+  // Patient & Bed Operations
   registerPatient: (
     patientInput: Omit<PatientRecord, 'id' | 'mrn' | 'status' | 'admissionDate'> & {
       addToWaitingList?: boolean;
     }
   ) => PatientRecord;
+  updatePatient: (
+    patientId: string,
+    updates: Partial<
+      Pick<
+        PatientRecord,
+        | 'name'
+        | 'age'
+        | 'gender'
+        | 'bloodGroup'
+        | 'diagnosis'
+        | 'acuity'
+        | 'requiredWardType'
+        | 'needsVentilator'
+        | 'needsIsolation'
+        | 'attendingPhysician'
+        | 'contactPhone'
+        | 'vitals'
+      >
+    >
+  ) => void;
   allocateBedToPatient: (patientId: string, bedId: string) => boolean;
   updateBedStatus: (bedId: string, newStatus: BedStatus) => void;
   addNewBed: (input: {
@@ -54,6 +97,39 @@ interface HospitalContextType {
     summaryNotes: string,
     postBedStatus?: 'Cleaning' | 'Available'
   ) => void;
+  // Doctor Operations
+  addDoctor: (input: Omit<DoctorProfile, 'id'>) => DoctorProfile;
+  updateDoctorAvailability: (doctorId: string, availability: DoctorAvailability) => void;
+  // Appointment Operations (with Conflict Prevention)
+  bookAppointment: (
+    input: Omit<HospitalAppointment, 'id' | 'status'>
+  ) => { ok: boolean; error?: string; appointment?: HospitalAppointment };
+  updateAppointmentStatus: (appointmentId: string, status: AppointmentStatus) => void;
+  rescheduleAppointment: (
+    appointmentId: string,
+    newDate: string,
+    newTimeSlot: string
+  ) => { ok: boolean; error?: string };
+  // Department Operations
+  addDepartment: (input: Omit<HospitalDepartment, 'id'>) => void;
+  // Billing & Invoice Operations
+  createInvoice: (
+    input: Omit<HospitalInvoice, 'id' | 'invoiceNumber' | 'totalAmount'>
+  ) => HospitalInvoice;
+  updateInvoiceStatus: (
+    invoiceId: string,
+    status: PaymentStatus,
+    paymentMethod?: HospitalInvoice['paymentMethod']
+  ) => void;
+  // Medical Equipment Operations
+  addEquipment: (input: Omit<MedicalEquipment, 'id'>) => void;
+  updateEquipmentStatus: (
+    equipmentId: string,
+    availability: EquipmentAvailability,
+    condition?: EquipmentCondition
+  ) => void;
+  // Facility Settings & Audit
+  updateFacilitySettings: (updates: Partial<HospitalFacilitySettings>) => void;
   addAuditLog: (
     category: HospitalAuditLog['category'],
     action: string,
@@ -77,6 +153,12 @@ interface StoredHospitalState {
   admissions: AdmissionRecord[];
   discharges: DischargeRecord[];
   auditLogs: HospitalAuditLog[];
+  doctors: DoctorProfile[];
+  appointments: HospitalAppointment[];
+  departments: HospitalDepartment[];
+  invoices: HospitalInvoice[];
+  equipment: MedicalEquipment[];
+  facilitySettings: HospitalFacilitySettings;
 }
 
 function loadHospitalState(): StoredHospitalState {
@@ -93,6 +175,12 @@ function loadHospitalState(): StoredHospitalState {
           admissions: parsed.admissions || INITIAL_ADMISSIONS,
           discharges: parsed.discharges || INITIAL_DISCHARGES,
           auditLogs: parsed.auditLogs || INITIAL_HOSPITAL_AUDIT_LOGS,
+          doctors: parsed.doctors || INITIAL_DOCTORS,
+          appointments: parsed.appointments || INITIAL_APPOINTMENTS,
+          departments: parsed.departments || INITIAL_DEPARTMENTS,
+          invoices: parsed.invoices || INITIAL_INVOICES,
+          equipment: parsed.equipment || INITIAL_EQUIPMENT,
+          facilitySettings: parsed.facilitySettings || INITIAL_FACILITY_SETTINGS,
         };
       }
     }
@@ -107,6 +195,12 @@ function loadHospitalState(): StoredHospitalState {
     admissions: INITIAL_ADMISSIONS,
     discharges: INITIAL_DISCHARGES,
     auditLogs: INITIAL_HOSPITAL_AUDIT_LOGS,
+    doctors: INITIAL_DOCTORS,
+    appointments: INITIAL_APPOINTMENTS,
+    departments: INITIAL_DEPARTMENTS,
+    invoices: INITIAL_INVOICES,
+    equipment: INITIAL_EQUIPMENT,
+    facilitySettings: INITIAL_FACILITY_SETTINGS,
   };
 }
 
@@ -131,6 +225,19 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [auditLogs, setAuditLogs] = useState<HospitalAuditLog[]>(
     initial.auditLogs
   );
+  const [doctors, setDoctors] = useState<DoctorProfile[]>(initial.doctors);
+  const [appointments, setAppointments] = useState<HospitalAppointment[]>(
+    initial.appointments
+  );
+  const [departments, setDepartments] = useState<HospitalDepartment[]>(
+    initial.departments
+  );
+  const [invoices, setInvoices] = useState<HospitalInvoice[]>(initial.invoices);
+  const [equipment, setEquipment] = useState<MedicalEquipment[]>(
+    initial.equipment
+  );
+  const [facilitySettings, setFacilitySettings] =
+    useState<HospitalFacilitySettings>(initial.facilitySettings);
 
   useEffect(() => {
     try {
@@ -142,12 +249,32 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         admissions,
         discharges,
         auditLogs: auditLogs.slice(0, 150),
+        doctors,
+        appointments,
+        departments,
+        invoices,
+        equipment,
+        facilitySettings,
       };
       localStorage.setItem(HOSPITAL_STORAGE_KEY, JSON.stringify(state));
     } catch (e) {
       console.warn('Unable to persist hospital state', e);
     }
-  }, [wards, beds, patients, waitingQueue, admissions, discharges, auditLogs]);
+  }, [
+    wards,
+    beds,
+    patients,
+    waitingQueue,
+    admissions,
+    discharges,
+    auditLogs,
+    doctors,
+    appointments,
+    departments,
+    invoices,
+    equipment,
+    facilitySettings,
+  ]);
 
   const addAuditLog = useCallback(
     (
@@ -242,6 +369,63 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
     [addAuditLog]
   );
 
+  const updatePatient = useCallback(
+    (
+      patientId: string,
+      updates: Partial<
+        Pick<
+          PatientRecord,
+          | 'name'
+          | 'age'
+          | 'gender'
+          | 'bloodGroup'
+          | 'diagnosis'
+          | 'acuity'
+          | 'requiredWardType'
+          | 'needsVentilator'
+          | 'needsIsolation'
+          | 'attendingPhysician'
+          | 'contactPhone'
+          | 'vitals'
+        >
+      >
+    ) => {
+      setPatients((prev) =>
+        prev.map((p) => (p.id === patientId ? { ...p, ...updates } : p))
+      );
+      setWaitingQueue((prev) =>
+        prev.map((w) => {
+          if (w.patientId !== patientId) return w;
+          const scoreMap: Record<AcuityLevel, number> = {
+            Critical: 95,
+            High: 82,
+            Moderate: 60,
+            Stable: 35,
+          };
+          const newAcuity = updates.acuity || w.acuity;
+          return {
+            ...w,
+            patientName: updates.name ?? w.patientName,
+            age: updates.age ?? w.age,
+            diagnosis: updates.diagnosis ?? w.diagnosis,
+            acuity: newAcuity,
+            priorityScore: scoreMap[newAcuity],
+            requiredWardType: updates.requiredWardType ?? w.requiredWardType,
+            needsVentilator: updates.needsVentilator ?? w.needsVentilator,
+            needsIsolation: updates.needsIsolation ?? w.needsIsolation,
+            requestingDoctor: updates.attendingPhysician ?? w.requestingDoctor,
+          };
+        })
+      );
+      addAuditLog(
+        'Admission',
+        `Updated clinical profile for patient ${updates.name || patientId}.`,
+        'Info'
+      );
+    },
+    [addAuditLog]
+  );
+
   const getRecommendedBedsForPatient = useCallback(
     (patient: {
       requiredWardType: WardType;
@@ -274,7 +458,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
-      // Update Bed
       setBeds((prev) =>
         prev.map((b) =>
           b.id === bedId
@@ -289,7 +472,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         )
       );
 
-      // Update Patient
       setPatients((prev) =>
         prev.map((p) =>
           p.id === patientId
@@ -303,12 +485,10 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         )
       );
 
-      // Remove from Waiting Queue
       setWaitingQueue((prev) =>
         prev.filter((w) => w.patientId !== patientId)
       );
 
-      // Create Admission Record
       const newAdm: AdmissionRecord = {
         id: `ADM-${Math.floor(710 + Math.random() * 289)}`,
         patientId: targetPatient.id,
@@ -431,7 +611,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
       const wardName = targetPatient.assignedWardName || 'General Suite';
       const nowStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
-      // Update Patient
       setPatients((prev) =>
         prev.map((p) =>
           p.id === patientId
@@ -444,7 +623,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         )
       );
 
-      // Release Bed
       if (targetPatient.assignedBedId) {
         setBeds((prev) =>
           prev.map((b) =>
@@ -461,7 +639,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
 
-      // Mark admission completed
       setAdmissions((prev) =>
         prev.map((adm) =>
           adm.patientId === patientId ? { ...adm, status: 'Completed' } : adm
@@ -494,6 +671,263 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
     [patients, currentUser, addAuditLog]
   );
 
+  // ==========================================================================
+  // DOCTORS, APPOINTMENTS, DEPARTMENTS, BILLING & MEDICAL EQUIPMENT OPERATIONS
+  // ==========================================================================
+
+  const addDoctor = useCallback(
+    (input: Omit<DoctorProfile, 'id'>): DoctorProfile => {
+      const newDoc: DoctorProfile = {
+        ...input,
+        id: `DOC-${Math.floor(210 + Math.random() * 780)}`,
+      };
+      setDoctors((prev) => [newDoc, ...prev]);
+      addAuditLog(
+        'StaffAdmin',
+        `Registered attending physician ${newDoc.name} (${newDoc.specialization} · ${newDoc.department}).`,
+        'Info'
+      );
+      return newDoc;
+    },
+    [addAuditLog]
+  );
+
+  const updateDoctorAvailability = useCallback(
+    (doctorId: string, availability: DoctorAvailability) => {
+      setDoctors((prev) =>
+        prev.map((d) => (d.id === doctorId ? { ...d, availability } : d))
+      );
+      const doc = doctors.find((d) => d.id === doctorId);
+      addAuditLog(
+        'StaffAdmin',
+        `Updated availability for ${doc?.name || doctorId} to [${availability}].`,
+        'Info'
+      );
+    },
+    [doctors, addAuditLog]
+  );
+
+  const bookAppointment = useCallback(
+    (
+      input: Omit<HospitalAppointment, 'id' | 'status'>
+    ): { ok: boolean; error?: string; appointment?: HospitalAppointment } => {
+      // Conflict check: prevent booking same doctor on same date + timeSlot if already Scheduled
+      const conflict = appointments.find(
+        (a) =>
+          a.status === 'Scheduled' &&
+          a.doctorId === input.doctorId &&
+          a.date === input.date &&
+          a.timeSlot.toLowerCase() === input.timeSlot.toLowerCase()
+      );
+      if (conflict) {
+        return {
+          ok: false,
+          error: `Scheduling conflict: ${input.doctorName} is already booked on ${input.date} at ${input.timeSlot} with patient ${conflict.patientName}. Please select another time slot or physician.`,
+        };
+      }
+
+      const newApt: HospitalAppointment = {
+        ...input,
+        id: `APT-${Math.floor(410 + Math.random() * 580)}`,
+        status: 'Scheduled',
+      };
+      setAppointments((prev) => [newApt, ...prev]);
+      addAuditLog(
+        'Appointment',
+        `Scheduled ${newApt.type} appointment for ${newApt.patientName} with ${newApt.doctorName} on ${newApt.date} at ${newApt.timeSlot}.`,
+        newApt.type === 'Emergency' ? 'Urgent' : 'Info'
+      );
+      return { ok: true, appointment: newApt };
+    },
+    [appointments, addAuditLog]
+  );
+
+  const updateAppointmentStatus = useCallback(
+    (appointmentId: string, status: AppointmentStatus) => {
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === appointmentId ? { ...a, status } : a))
+      );
+      const apt = appointments.find((a) => a.id === appointmentId);
+      addAuditLog(
+        'Appointment',
+        `Marked appointment ${appointmentId} (${apt?.patientName || 'Patient'}) as [${status}].`,
+        'Info'
+      );
+    },
+    [appointments, addAuditLog]
+  );
+
+  const rescheduleAppointment = useCallback(
+    (
+      appointmentId: string,
+      newDate: string,
+      newTimeSlot: string
+    ): { ok: boolean; error?: string } => {
+      const target = appointments.find((a) => a.id === appointmentId);
+      if (!target) {
+        return { ok: false, error: 'Appointment not found.' };
+      }
+      const conflict = appointments.find(
+        (a) =>
+          a.id !== appointmentId &&
+          a.status === 'Scheduled' &&
+          a.doctorId === target.doctorId &&
+          a.date === newDate &&
+          a.timeSlot.toLowerCase() === newTimeSlot.toLowerCase()
+      );
+      if (conflict) {
+        return {
+          ok: false,
+          error: `Scheduling conflict: ${target.doctorName} already has an appointment on ${newDate} at ${newTimeSlot}.`,
+        };
+      }
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a.id === appointmentId
+            ? { ...a, date: newDate, timeSlot: newTimeSlot, status: 'Scheduled' }
+            : a
+        )
+      );
+      addAuditLog(
+        'Appointment',
+        `Rescheduled appointment ${appointmentId} (${target.patientName}) to ${newDate} at ${newTimeSlot}.`,
+        'Info'
+      );
+      return { ok: true };
+    },
+    [appointments, addAuditLog]
+  );
+
+  const addDepartment = useCallback(
+    (input: Omit<HospitalDepartment, 'id'>) => {
+      const newDep: HospitalDepartment = {
+        ...input,
+        id: `DEP-${Date.now().toString().slice(-3)}`,
+      };
+      setDepartments((prev) => [...prev, newDep]);
+      addAuditLog(
+        'Settings',
+        `Added clinical department ${newDep.name} (${newDep.code}).`,
+        'Info'
+      );
+    },
+    [addAuditLog]
+  );
+
+  const createInvoice = useCallback(
+    (
+      input: Omit<HospitalInvoice, 'id' | 'invoiceNumber' | 'totalAmount'>
+    ): HospitalInvoice => {
+      const seq = Math.floor(810 + Math.random() * 189);
+      const totalAmount =
+        Number(input.consultationCharge) +
+        Number(input.bedAndNursingCharge) +
+        Number(input.medicationAndLabCharge);
+      const newInv: HospitalInvoice = {
+        ...input,
+        id: `INV-${seq}`,
+        invoiceNumber: `BLC-2026-0${seq}`,
+        totalAmount,
+      };
+      setInvoices((prev) => [newInv, ...prev]);
+      addAuditLog(
+        'Billing',
+        `Generated invoice ${newInv.invoiceNumber} ($${totalAmount.toLocaleString()}) for ${newInv.patientName}.`,
+        'Info'
+      );
+      return newInv;
+    },
+    [addAuditLog]
+  );
+
+  const updateInvoiceStatus = useCallback(
+    (
+      invoiceId: string,
+      status: PaymentStatus,
+      paymentMethod?: HospitalInvoice['paymentMethod']
+    ) => {
+      setInvoices((prev) =>
+        prev.map((inv) =>
+          inv.id === invoiceId
+            ? {
+                ...inv,
+                status,
+                paymentMethod: paymentMethod || inv.paymentMethod,
+              }
+            : inv
+        )
+      );
+      const inv = invoices.find((i) => i.id === invoiceId);
+      addAuditLog(
+        'Billing',
+        `Updated invoice ${inv?.invoiceNumber || invoiceId} payment status to [${status}].`,
+        'Info'
+      );
+    },
+    [invoices, addAuditLog]
+  );
+
+  const addEquipment = useCallback(
+    (input: Omit<MedicalEquipment, 'id'>) => {
+      const newEq: MedicalEquipment = {
+        ...input,
+        id: `EQP-${Math.floor(110 + Math.random() * 880)}`,
+      };
+      setEquipment((prev) => [newEq, ...prev]);
+      addAuditLog(
+        'Equipment',
+        `Registered medical equipment ${newEq.name} (${newEq.assetTag}) in ${newEq.department}.`,
+        'Info'
+      );
+    },
+    [addAuditLog]
+  );
+
+  const updateEquipmentStatus = useCallback(
+    (
+      equipmentId: string,
+      availability: EquipmentAvailability,
+      condition?: EquipmentCondition
+    ) => {
+      setEquipment((prev) =>
+        prev.map((eq) =>
+          eq.id === equipmentId
+            ? {
+                ...eq,
+                availability,
+                condition: condition || eq.condition,
+                lastServicedDate:
+                  availability === 'Available' && condition === 'Excellent'
+                    ? new Date().toISOString().slice(0, 10)
+                    : eq.lastServicedDate,
+              }
+            : eq
+        )
+      );
+      const eq = equipment.find((e) => e.id === equipmentId);
+      addAuditLog(
+        'Equipment',
+        `Updated equipment ${eq?.name || equipmentId} status to [${availability}]${
+          condition ? ` · Condition: ${condition}` : ''
+        }.`,
+        availability === 'Under Maintenance' ? 'Elevated' : 'Info'
+      );
+    },
+    [equipment, addAuditLog]
+  );
+
+  const updateFacilitySettings = useCallback(
+    (updates: Partial<HospitalFacilitySettings>) => {
+      setFacilitySettings((prev) => ({ ...prev, ...updates }));
+      addAuditLog(
+        'Settings',
+        `Updated hospital administration & facility configuration.`,
+        'Info'
+      );
+    },
+    [addAuditLog]
+  );
+
   const resetHospitalDemoData = useCallback(() => {
     setWards(INITIAL_WARDS);
     setBeds(INITIAL_BEDS);
@@ -502,6 +936,12 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
     setAdmissions(INITIAL_ADMISSIONS);
     setDischarges(INITIAL_DISCHARGES);
     setAuditLogs(INITIAL_HOSPITAL_AUDIT_LOGS);
+    setDoctors(INITIAL_DOCTORS);
+    setAppointments(INITIAL_APPOINTMENTS);
+    setDepartments(INITIAL_DEPARTMENTS);
+    setInvoices(INITIAL_INVOICES);
+    setEquipment(INITIAL_EQUIPMENT);
+    setFacilitySettings(INITIAL_FACILITY_SETTINGS);
     localStorage.removeItem(HOSPITAL_STORAGE_KEY);
   }, []);
 
@@ -515,12 +955,30 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({
         admissions,
         discharges,
         auditLogs,
+        doctors,
+        appointments,
+        departments,
+        invoices,
+        equipment,
+        facilitySettings,
         registerPatient,
+        updatePatient,
         allocateBedToPatient,
         updateBedStatus,
         addNewBed,
         addWard,
         dischargePatient,
+        addDoctor,
+        updateDoctorAvailability,
+        bookAppointment,
+        updateAppointmentStatus,
+        rescheduleAppointment,
+        addDepartment,
+        createInvoice,
+        updateInvoiceStatus,
+        addEquipment,
+        updateEquipmentStatus,
+        updateFacilitySettings,
         addAuditLog,
         resetHospitalDemoData,
         getRecommendedBedsForPatient,

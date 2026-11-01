@@ -143,7 +143,133 @@ export interface HospitalAuditLog {
   timestamp: string;
   actorName: string;
   actorRole: StaffRole;
-  category: 'Authentication' | 'Allocation' | 'Admission' | 'Discharge' | 'BedStatus' | 'StaffAdmin' | 'Settings';
+  category:
+    | 'Authentication'
+    | 'Allocation'
+    | 'Admission'
+    | 'Discharge'
+    | 'BedStatus'
+    | 'StaffAdmin'
+    | 'Settings'
+    | 'Appointment'
+    | 'Billing'
+    | 'Equipment';
   action: string;
   severity: 'Info' | 'Elevated' | 'Urgent';
+}
+
+// ============================================================================
+// EXTENDED OOTS HOSPITAL MANAGEMENT DOMAIN ENTITIES
+// ============================================================================
+
+export type DoctorAvailability =
+  | 'Available'
+  | 'In Consultation'
+  | 'On Call'
+  | 'Off Duty';
+
+export interface DoctorProfile {
+  id: string;
+  name: string;
+  specialization: string;
+  department: string;
+  qualification: string;
+  experienceYears: number;
+  consultationFee: number;
+  availability: DoctorAvailability;
+  scheduleDays: string;
+  shiftHours: string;
+  roomNumber: string;
+  email: string;
+  phone: string;
+}
+
+export type AppointmentStatus = 'Scheduled' | 'Completed' | 'Cancelled';
+export type AppointmentType =
+  | 'Consultation'
+  | 'Follow-up'
+  | 'Emergency'
+  | 'Pre-Surgical';
+
+export interface HospitalAppointment {
+  id: string;
+  patientId: string;
+  patientName: string;
+  mrn: string;
+  doctorId: string;
+  doctorName: string;
+  department: string;
+  date: string; // YYYY-MM-DD
+  timeSlot: string; // e.g. '09:30 AM'
+  type: AppointmentType;
+  reason: string;
+  status: AppointmentStatus;
+  notes?: string;
+}
+
+export interface HospitalDepartment {
+  id: string;
+  name: string;
+  code: string;
+  floor: string;
+  wing: string;
+  headDoctor: string;
+  totalBeds: number;
+  outpatientRooms: number;
+  contactExtension: string;
+  description: string;
+  specialties: string[];
+}
+
+export type PaymentStatus = 'Paid' | 'Pending' | 'Overdue';
+
+export interface HospitalInvoice {
+  id: string;
+  invoiceNumber: string;
+  patientId: string;
+  patientName: string;
+  mrn: string;
+  doctorName: string;
+  department: string;
+  issuedDate: string;
+  dueDate: string;
+  consultationCharge: number;
+  bedAndNursingCharge: number;
+  medicationAndLabCharge: number;
+  totalAmount: number;
+  status: PaymentStatus;
+  paymentMethod: 'Insurance' | 'Card' | 'Hospital Credit' | 'Pending';
+}
+
+export type EquipmentAvailability = 'Available' | 'In Use' | 'Under Maintenance';
+export type EquipmentCondition = 'Excellent' | 'Good' | 'Needs Calibration';
+
+export interface MedicalEquipment {
+  id: string;
+  assetTag: string;
+  name: string;
+  category:
+    | 'Life Support'
+    | 'Diagnostic Imaging'
+    | 'Patient Monitoring'
+    | 'Surgical & Anesthesia'
+    | 'Laboratory';
+  department: string;
+  assignedWard: string;
+  availability: EquipmentAvailability;
+  condition: EquipmentCondition;
+  lastServicedDate: string;
+  nextCalibrationDate: string;
+  serialNumber: string;
+}
+
+export interface HospitalFacilitySettings {
+  facilityName: string;
+  campusAddress: string;
+  emergencyHotline: string;
+  accreditationCode: string;
+  chiefMedicalOfficer: string;
+  defaultConsultationMinutes: number;
+  criticalOccupancyThresholdPct: number;
+  autoQueueSanitizationOnDischarge: boolean;
 }

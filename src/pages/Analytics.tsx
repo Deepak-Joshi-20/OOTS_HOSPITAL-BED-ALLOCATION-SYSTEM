@@ -5,7 +5,8 @@ import {
   Activity,
   Bed,
   Users,
-  Cpu,
+  Calendar,
+  Building2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -24,7 +25,16 @@ import { useTheme } from '../context/ThemeContext';
 import { InteractivePredictiveChart } from '../components/charts/InteractivePredictiveChart';
 
 export const Analytics: React.FC = () => {
-  const { wards, beds, patients, waitingQueue } = useHospital();
+  const {
+    wards,
+    beds,
+    patients,
+    waitingQueue,
+    doctors,
+    appointments,
+    departments,
+    equipment,
+  } = useHospital();
   const { isBlossom, palette } = useTheme();
 
   const wardAnalyticsData = useMemo(() => {
@@ -70,6 +80,22 @@ export const Analytics: React.FC = () => {
         ];
   }, [patients, isBlossom]);
 
+  const departmentSummaries = useMemo(() => {
+    return departments.map((dept) => {
+      const deptDoctors = doctors.filter((d) => d.department === dept.name);
+      const deptAppointments = appointments.filter(
+        (a) => a.department === dept.name
+      );
+      const deptEquipment = equipment.filter((e) => e.department === dept.name);
+      return {
+        ...dept,
+        doctorCount: deptDoctors.length,
+        appointmentCount: deptAppointments.length,
+        equipmentCount: deptEquipment.length,
+      };
+    });
+  }, [departments, doctors, appointments, equipment]);
+
   const handleExportCSV = () => {
     const headers = [
       'Ward Name,Occupied Beds,Available Beds,Turnover Beds,Occupancy %',
@@ -99,13 +125,13 @@ export const Analytics: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/25 px-3 py-1 text-[11px] font-semibold text-white mb-2">
             <BarChart3 className="h-3.5 w-3.5" />
-            <span>HOSPITAL CAPACITY &amp; BIOMEDICAL ANALYTICS</span>
+            <span>HOSPITAL REPORTS &amp; CLINICAL ANALYTICS</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Clinical Utilization &amp; Predictive Telemetry
+            Patient Statistics, Bed Occupancy &amp; Department Reports
           </h1>
           <p className="text-xs text-white/85 mt-0.5">
-            Real-time ward bed utilization, patient acuity stratification, and historical predictive maintenance telemetry.
+            Comprehensive analytics covering inpatient ward occupancy, appointment trends, acuity stratification, and department summaries.
           </p>
         </div>
 
@@ -165,28 +191,29 @@ export const Analytics: React.FC = () => {
               {patients.length}
             </span>
             <span className="text-xs font-semibold text-[#8975D5]">
-              {waitingQueue.length} in Triage Queue
+              {waitingQueue.length} in Waiting Queue
             </span>
           </div>
         </div>
 
         <div className="rounded-2xl bg-white border border-[#D5E0F2] p-4 shadow-xs">
           <div className="flex items-center justify-between text-[11px] font-bold uppercase text-[#6E7A99]">
-            <span>Biomedical Telemetry</span>
-            <Cpu className="h-4 w-4 text-[#4169E1]" />
+            <span>Outpatient Appointments</span>
+            <Calendar className="h-4 w-4 text-[#4169E1]" />
           </div>
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-2xl font-bold font-mono text-[#252D43]">
-              99.4%
+              {appointments.length}
             </span>
             <span className="text-xs font-semibold text-[#4169E1]">
-              Continuous Sync
+              {appointments.filter((a) => a.status === 'Scheduled').length}{' '}
+              Scheduled
             </span>
           </div>
         </div>
       </div>
 
-      {/* Interactive Recharts Predictive Maintenance Component */}
+      {/* Interactive Recharts Hospital Trends Component */}
       <InteractivePredictiveChart />
 
       {/* Ward Utilization & Patient Acuity Breakdown */}
@@ -323,6 +350,62 @@ export const Analytics: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Department-Wise Summary Report Table */}
+      <div className="rounded-3xl border border-[#D5E0F2] bg-white p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Building2 className="h-5 w-5 text-[#4169E1]" />
+            <div>
+              <h2 className="text-lg font-bold text-[#252D43]">
+                Department-Wise Clinical Summary
+              </h2>
+              <p className="text-xs text-[#6E7A99]">
+                Overview of specialist doctors, outpatient appointment volume, and medical assets per hospital department
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-[#D5E0F2] bg-[#111A35] text-white text-[11px] font-bold uppercase tracking-wider">
+                <th className="py-3 px-4">Department</th>
+                <th className="py-3 px-4">Head of Department</th>
+                <th className="py-3 px-4">Location</th>
+                <th className="py-3 px-4">Specialists</th>
+                <th className="py-3 px-4">Appointments</th>
+                <th className="py-3 px-4">Medical Equipment</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E2E9F5]">
+              {departmentSummaries.map((dept) => (
+                <tr key={dept.id} className="hover:bg-[#E9EFF8]/50">
+                  <td className="py-3 px-4 font-bold text-[#252D43]">
+                    {dept.name}
+                  </td>
+                  <td className="py-3 px-4 font-semibold text-[#4169E1]">
+                    {dept.headDoctor}
+                  </td>
+                  <td className="py-3 px-4 text-[#5A6582]">
+                    {dept.floor}
+                  </td>
+                  <td className="py-3 px-4 font-mono font-bold text-[#252D43]">
+                    {dept.doctorCount} Doctors
+                  </td>
+                  <td className="py-3 px-4 font-mono font-bold text-[#523B9E]">
+                    {dept.appointmentCount} Visits
+                  </td>
+                  <td className="py-3 px-4 font-mono font-semibold text-[#252D43]">
+                    {dept.equipmentCount} Units
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

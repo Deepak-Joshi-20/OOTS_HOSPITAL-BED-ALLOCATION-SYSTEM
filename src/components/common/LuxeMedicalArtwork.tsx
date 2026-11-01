@@ -14,7 +14,7 @@ export const ThemeSwitcherControl: React.FC<{ compact?: boolean }> = ({
 
   return (
     <div
-      className={`inline-flex items-center rounded-2xl p-1 border transition-colors ${
+      className={`inline-flex items-center rounded-2xl p-0.5 sm:p-1 border transition-colors ${
         isBlossom
           ? 'bg-[#F5E9E8] border-[#C9A9B8] text-[#2E2532]'
           : 'bg-[#E9EFF8] border-[#B8C7E0] text-[#1A2130]'
@@ -25,27 +25,30 @@ export const ThemeSwitcherControl: React.FC<{ compact?: boolean }> = ({
       <button
         type="button"
         onClick={() => setTheme('blossom')}
-        className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+        className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-xl px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
           theme === 'blossom'
             ? 'bg-[#754C68] text-[#FAF1E8] shadow-xs'
             : 'text-[#414C66] hover:text-[#1A2130] hover:bg-white/60'
         }`}
       >
-        <Sparkles className="h-3 w-3" />
+        <Sparkles className="h-3 w-3 shrink-0" />
         <span>{compact ? 'Blossom' : 'Blossom Care'}</span>
       </button>
 
       <button
         type="button"
         onClick={() => setTheme('luxe')}
-        className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+        className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-xl px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
           theme === 'luxe'
             ? 'bg-[#202B52] text-white shadow-xs'
             : 'text-[#4E3D4A] hover:text-[#2E2532] hover:bg-white/60'
         }`}
       >
-        <Palette className="h-3 w-3" />
-        <span>{compact ? 'Arctic Bloom' : 'Arctic Bloom'}</span>
+        <Palette className="h-3 w-3 shrink-0" />
+        <span className="hidden xs:inline sm:inline">
+          {compact ? 'Arctic Bloom' : 'Arctic Bloom'}
+        </span>
+        <span className="inline xs:hidden sm:hidden">Arctic</span>
       </button>
     </div>
   );

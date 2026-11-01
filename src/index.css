@@ -525,6 +525,100 @@ html[data-theme="blossom"] .recharts-tooltip-item {
   background: var(--app-scroll-hover);
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile Responsive Typography, Dashboard Metrics & Table Cell Legibility (max-width: 640px) */
+@media (max-width: 640px) {
+  html {
+    font-size: 16.5px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+
+  /* Boost small utility text on mobile for effortless clinical legibility */
+  .text-xs {
+    font-size: 0.84rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .text-\[11px\] {
+    font-size: 0.8rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .text-\[10px\] {
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Increase Dashboard & KPI Metric Values on Mobile */
+  .dashboard-metric-value,
+  .tabular-nums.text-3xl,
+  .tabular-nums.text-2xl {
+    font-size: 2.15rem !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.02em;
+  }
+
+  .tabular-nums.text-4xl {
+    font-size: 2.6rem !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.025em;
+  }
+
+  .dashboard-metric-label {
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Increase Table Header & Cell Font Sizes and Line-Heights on Mobile */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+  }
+
+  table thead th {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
+    white-space: nowrap;
+  }
+
+  table tbody td {
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+    padding-top: 0.9rem !important;
+    padding-bottom: 0.9rem !important;
+    white-space: nowrap;
+  }
+
+  table tbody td .text-sm {
+    font-size: 0.98rem !important;
+    line-height: 1.45 !important;
+  }
+
+  table td.max-w-xs {
+    white-space: normal;
+    min-width: 200px;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;

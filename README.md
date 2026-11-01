@@ -1,211 +1,66 @@
-# Blossom Care – Hospital Bed Allocation System
+# Blossom Care — Intelligent Hospital Bed Allocation System
 
-A modern hospital bed management and intelligent allocation platform designed to streamline inpatient admissions, monitor ward occupancy, manage clinical bed availability and support efficient patient placement.
-
-Blossom Care provides hospital staff with a unified workspace to manage patients, wards, beds, admissions, waiting lists and allocation workflows through an intuitive interface.
-
----
-
-## Overview
-
-Hospital bed availability and patient placement are essential parts of hospital operations. Managing these processes manually can make it difficult to track occupancy, identify suitable beds and coordinate admissions efficiently.
-
-**Blossom Care** aims to simplify these workflows through a centralized digital platform that helps hospital staff monitor bed availability, manage patient records and make informed bed allocation decisions.
-
-The application includes an interactive dashboard, patient directory, ward management, bed monitoring and intelligent clinical bed matching.
-
-## Key Features
-
-### 1. Hospital Dashboard
-- Overview of hospital bed occupancy.
-- Total, available and occupied bed statistics.
-- Waiting patient summaries.
-- Ward-level occupancy information.
-- Admission and discharge activity.
-- Important alerts and operational indicators.
-
-### 2. Patient Directory & Clinical Profiles
-- Manage inpatient records.
-- View patient profiles and admission information.
-- Track clinical acuity information.
-- Maintain patient placement status.
-- Access relevant patient details from a centralized directory.
-
-### 3. Interactive Hospital Bed Grid
-- Visual representation of hospital beds.
-- Monitor occupied, available and cleaning beds.
-- View assigned patient information.
-- Track bed cleaning and sanitization turnover.
-- Monitor bed capabilities such as ventilator support, ECG and isolation requirements.
-
-### 4. Intelligent Clinical Bed Matching
-- Match patients with suitable available beds.
-- Consider clinical acuity and care requirements.
-- Account for ventilator support and isolation criteria.
-- Support specialty ward and ICU placement workflows.
-- Display available bed and waiting placement information.
-
-### 5. Admission & Discharge Management
-- Manage patient admission workflows.
-- Track placement requests.
-- Update bed occupancy following admissions and discharges.
-- Maintain consistent patient and bed assignment records.
-
-### 6. Waiting List Management
-- View patients awaiting placement.
-- Monitor placement requirements.
-- Support prioritization and bed allocation workflows.
-
-### 7. Ward & Bed Management
-- Manage hospital wards and clinical units.
-- Monitor occupancy and availability.
-- View ward-level bed information.
-- Track bed readiness and turnover status.
-
-### 8. Reports & Activity Monitoring
-- Review operational information.
-- Monitor admission and discharge activity.
-- View relevant system events and activity records.
+**Course:** Object Oriented Techniques using Java (`CCSE0355`)  
+**Team:** G-66  
+**Live Website:** [https://blossom-care-hospital.netlify.app/](https://blossom-care-hospital.netlify.app/)  
+**GitHub Repository:** [https://github.com/Deepak-Joshi-20/OOTS_HOSPITAL-BED-ALLOCATION-SYSTEM](https://github.com/Deepak-Joshi-20/OOTS_HOSPITAL-BED-ALLOCATION-SYSTEM)
 
 ---
 
-## User Roles & Access
+## 1. Project Overview
 
-The application is designed around role-based staff access.
+**Blossom Care — Intelligent Hospital Bed Allocation System** is an academic healthcare operations platform combining:
 
-| Role | Responsibilities |
-|---|---|
-| Administrator | System management, staff management, wards, beds and configuration |
-| Admission Staff | Patient records, admissions, waiting lists and bed placement |
-| Ward Staff | Ward occupancy, assigned patients and permitted bed-status updates |
+1. **Interactive React + TypeScript Frontend (`src/`)**: A dual-theme (**Blossom Care** & **Arctic Bloom**) hospital bed allocation and clinical coordination web application.
+2. **Java 17 + Spring Boot Backend (`java-backend/`)**: A genuine object-oriented Java implementation demonstrating Encapsulation, Inheritance (`Bed` → `ICUBed`, `GeneralBed`), Polymorphism, Abstraction (`BedAllocationPolicy`), Aggregation (`Ward` → `Bed`), custom Exception Handling, REST API endpoints (`/api/v1/*`), and JUnit 5 unit testing.
 
-Access to application features depends on the permissions configured for each role.
+---
 
-## Technology & Architecture
+## 2. Core Hospital Modules
 
-The application is developed as a web-based hospital management system.
+1. **Hospital Dashboard (`/`)**: Live hospital bed occupancy, ICU critical care suite availability, general & specialty capacity, priority waiting queue, ward occupancy charts, bed status donut breakdown, recent admissions/discharges, and interactive biomedical equipment telemetry chart.
+2. **Patient Management (`/patients`)**: Inpatient & waiting patient directory, new patient registration, patient record editing, vital signs, and visit/admission history.
+3. **Bed Management (`/beds`)**: Interactive hospital bed floor grid across 36 beds with ventilator, telemetry, and isolation badges plus cleaning/maintenance status transitions.
+4. **Ward Management (`/wards`)**: Live capacity, nurse-to-patient ratios, oxygen line pressure, and bed readiness across 6 clinical wards (ICU, Cardiac, Surgical, General, Pediatrics, Maternity).
+5. **Waiting List (`/waiting-list`)**: Priority-ordered inpatient placement queue with transparent clinical priority scores and FIFO tie-breaking.
+6. **Intelligent Bed Allocation (`/allocation`)**: Clinical decision-support workspace ranking available beds by ward specialty (`+50`), ventilator support (`+25`), and isolation capability (`+20`).
+7. **Admissions (`/admissions`) & Discharges (`/discharges`)**: Complete inpatient placement logs and one-click discharge processing with automatic bed sanitization queueing.
+8. **Hospital Equipment Management (`/equipment`, `/alerts`, `/doctors`, `/appointments`, `/departments`, `/billing`)**: Medical equipment inventory and service alerts, clinical alerts, specialist doctors, outpatient appointment scheduling, hospital departments, and patient billing.
+9. **Analytics (`/analytics`), Audit Logs (`/audit-logs`), Staff Management (`/staff`), & Settings (`/settings`)**: Utilization charts, CSV export, role-based access control (`Administrator`, `Admission Staff`, `Ward Staff`), and theme switching.
 
-Its implementation may include:
+---
 
-- Frontend application for the user interface.
-- Authentication for authorized hospital staff.
-- Database integration for persistent application records.
-- Application logic for bed allocation and patient placement.
-- Dashboard visualizations for operational monitoring.
-
-**Note:** Refer to the actual project dependencies and configuration files for the precise technologies and versions used in this repository.
-
-## Demo Environment
-
-The project may include fictional demonstration records to showcase application functionality.
-
-Demo records can include:
-
-- Sample patients.
-- Hospital wards and beds.
-- Admission and discharge records.
-- Waiting placement requests.
-- Clinical bed requirements.
-- Bed occupancy and cleaning statuses.
-
-All demonstration patient identities and records are fictional and must not be treated as real patient information.
-
-A visible demo indicator should be used when demonstration data is active.
-
-## Installation & Local Development
-
-Clone the repository:
-
-```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-cd YOUR_PROJECT_FOLDER
-```
-
-Install dependencies using the package manager specified by the project:
+## 3. Running the Frontend (React + TypeScript + Vite)
 
 ```bash
 npm install
-```
-
-Start the development server if the project uses the standard Vite development setup:
-
-```bash
 npm run dev
 ```
 
-Build the application:
+Build and type-check for production:
 
 ```bash
+npm run lint
 npm run build
 ```
 
-**Important:** These commands assume a Node.js-based project. Check `package.json` for the actual scripts and dependencies before running them.
-
-## Deployment
-
-The frontend can be deployed through a compatible hosting provider such as Netlify.
-
-A typical Vite deployment uses:
-
-| Configuration | Value |
-|---|---|
-| Build command | `npm run build` |
-| Publish directory | `dist` |
-
-These settings must be verified against the actual project configuration.
-
-If the application uses external authentication, databases or backend APIs, those services must also be configured correctly.
-
-## Environment Variables & Security
-
-- Keep API keys and private credentials out of the source code.
-- Store sensitive configuration in environment variables.
-- Never expose server-side secrets in frontend code.
-- Configure authentication and database permissions securely.
-- Do not store passwords as plain text.
-- Restrict access to patient and staff information.
-- Use fictional demonstration data for academic presentations.
-
-Do not upload `.env` files containing secrets to GitHub.
-
-## Project Objectives
-
-The primary objectives of Blossom Care are to:
-
-1. Centralize hospital bed and patient information.
-2. Improve visibility into ward occupancy and bed availability.
-3. Simplify inpatient admission and placement workflows.
-4. Support clinical compatibility-based bed matching.
-5. Improve coordination between hospital staff.
-6. Provide an organized and accessible hospital management interface.
-
-## Scope & Limitations
-
-Blossom Care is an academic software project and demonstration system.
-
-It should not be considered a clinically validated hospital information system. Bed matching recommendations are intended to support demonstration workflows and do not replace professional clinical judgment.
-
-Unless explicitly integrated and tested, the application does not represent a connection to real hospital equipment, monitoring devices or hospital information systems.
-
-## Future Enhancements
-
-Potential future improvements include:
-
-- Integration with real hospital information systems.
-- Live bed-status updates.
-- Hospital equipment and sensor integration.
-- Advanced patient placement optimization.
-- Enhanced operational reporting.
-- Additional interoperability and security capabilities.
+### Optional Java Backend Connection
+By default, the React frontend operates seamlessly using its built-in demonstration dataset so it works offline and on static hosts like Netlify. To connect the frontend to the local Java Spring Boot server, set `VITE_HOSPITAL_API_URL="http://localhost:8080/api/v1"` in `.env`.
 
 ---
 
-## License
+## 4. Running the Java 17 + Spring Boot Backend (`java-backend/`)
 
-This project is developed for academic and educational purposes.
+See [`java-backend/README.md`](./java-backend/README.md) for complete documentation of the OOP class hierarchy, REST API endpoints, and JUnit 5 test suite.
 
-Add an appropriate license before permitting external reuse or distribution.
+```bash
+cd java-backend
+mvn test
+mvn spring-boot:run
+```
 
 ---
 
-**Blossom Care – Smarter Bed Management. Better Hospital Coordination.**
+## 5. Academic Disclaimer
+
+Blossom Care is an academic software project developed for **CCSE0355 — Object Oriented Techniques using Java**. All patient identities, clinical metrics, and equipment telemetry are fictional demonstration data. The bed allocation scoring algorithm is an educational decision-support model and does not replace professional clinical judgment.

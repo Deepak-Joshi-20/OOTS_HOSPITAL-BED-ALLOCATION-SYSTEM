@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
+  ReferenceLine,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -137,6 +140,30 @@ export const Dashboard: React.FC = () => {
     [stats, isBlossom]
   );
 
+  // 7-Day Trend of ICU vs. General Ward Occupancy Rates (%)
+  const sevenDayOccupancyTrend = useMemo(() => {
+    const liveIcuRate = Math.round(
+      (stats.icuOccupied / Math.max(1, stats.icuTotal)) * 100
+    );
+    const liveGeneralRate = Math.round(
+      (stats.generalOccupied / Math.max(1, stats.generalTotal)) * 100
+    );
+
+    return [
+      { day: 'Day 1 (Mon)', icuOccupancy: 72, generalOccupancy: 58 },
+      { day: 'Day 2 (Tue)', icuOccupancy: 76, generalOccupancy: 61 },
+      { day: 'Day 3 (Wed)', icuOccupancy: 81, generalOccupancy: 64 },
+      { day: 'Day 4 (Thu)', icuOccupancy: 78, generalOccupancy: 67 },
+      { day: 'Day 5 (Fri)', icuOccupancy: 85, generalOccupancy: 70 },
+      { day: 'Day 6 (Sat)', icuOccupancy: 82, generalOccupancy: 66 },
+      {
+        day: 'Today (Live)',
+        icuOccupancy: liveIcuRate,
+        generalOccupancy: liveGeneralRate,
+      },
+    ];
+  }, [stats]);
+
   const handleQuickAssign = (patientId: string) => {
     const qItem = waitingQueue.find((w) => w.patientId === patientId);
     if (!qItem) return;
@@ -152,7 +179,7 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-6">
       {/* 1. MAGAZINE-INSPIRED WELCOME HERO BANNER */}
       <section
-        className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 shadow-md border ${
+        className={`relative overflow-hidden rounded-3xl p-5 sm:p-8 shadow-md border ${
           isBlossom
             ? 'bg-gradient-to-r from-[#F5E9E8] via-[#FAF1E8] to-[#EAE2F3] text-[#3D3440] border-[#D9B9C8]'
             : 'bg-gradient-to-r from-[#111A35] via-[#202B52] to-[#111A35] text-white border-[#4169E1]/30'
@@ -161,26 +188,26 @@ export const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-7 space-y-3">
             <div
-              className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold ${
+              className={`inline-flex items-center gap-2 rounded-full px-3 sm:px-3.5 py-1 text-[11px] sm:text-xs font-semibold ${
                 isBlossom
                   ? 'bg-[#FFFDFB]/85 border border-[#D9B9C8] text-[#754C68]'
                   : 'bg-white/10 text-[#619BFF]'
               }`}
             >
               <Sparkles
-                className={`h-3.5 w-3.5 ${
+                className={`h-3.5 w-3.5 shrink-0 ${
                   isBlossom ? 'text-[#B98CA7]' : 'text-[#FF8278]'
                 }`}
               />
-              <span>
+              <span className="truncate">
                 {isBlossom
                   ? `BLOSSOM CARE SANCTUARY · ${currentUser?.role.toUpperCase()}`
-                  : `AURELIA HOSPITAL OPERATIONS CONTROL · ${currentUser?.role.toUpperCase()}`}
+                  : `BLOSSOM CARE HOSPITAL BED ALLOCATION · ${currentUser?.role.toUpperCase()}`}
               </span>
             </div>
 
             <h1
-              className={`text-3xl sm:text-4xl lg:text-[42px] font-bold leading-tight text-balance ${
+              className={`text-2xl sm:text-4xl lg:text-[42px] font-bold leading-tight text-balance ${
                 isBlossom
                   ? 'text-[#3D3440] font-editorial'
                   : 'text-white font-display'
@@ -189,17 +216,17 @@ export const Dashboard: React.FC = () => {
               Welcome back, {currentUser?.name || 'Clinical Director'}
             </h1>
             <p
-              className={`text-sm max-w-xl leading-relaxed ${
+              className={`text-xs sm:text-sm max-w-xl leading-relaxed ${
                 isBlossom ? 'text-[#665663]' : 'text-[#E8E4FF]/85'
               }`}
             >
               Real-time bed availability, ICU &amp; maternity capacity coordination, and priority inpatient placement across 6 care wings.
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
               <button
                 onClick={() => navigate('/allocation')}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all cursor-pointer ${
+                className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all cursor-pointer ${
                   isBlossom
                     ? 'bg-[#754C68] hover:bg-[#5E3B53]'
                     : 'bg-[#4169E1] hover:bg-[#3256C9]'
@@ -210,7 +237,7 @@ export const Dashboard: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/patients')}
-                className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all cursor-pointer ${
+                className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all cursor-pointer ${
                   isBlossom
                     ? 'border-[#D9B9C8] bg-[#FFFDFB] hover:bg-[#F5E9E8] text-[#3D3440]'
                     : 'border-white/20 bg-white/10 hover:bg-white/15 text-white'
@@ -245,7 +272,7 @@ export const Dashboard: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-xs font-semibold uppercase tracking-wider ${
+              className={`dashboard-metric-label text-xs font-semibold uppercase tracking-wider ${
                 isBlossom ? 'text-[#F5E9E8]' : 'text-[#619BFF]'
               }`}
             >
@@ -257,11 +284,11 @@ export const Dashboard: React.FC = () => {
               }`}
             />
           </div>
-          <div className="my-3 flex items-baseline gap-3">
-            <span className="text-4xl font-bold font-mono tabular-nums text-white">
+          <div className="my-3.5 flex items-baseline gap-3">
+            <span className="dashboard-metric-value text-4xl font-bold font-mono tabular-nums text-white">
               {stats.occupancyRate}%
             </span>
-            <span className="text-xs text-white/80 font-mono">
+            <span className="dashboard-metric-label text-xs text-white/85 font-mono">
               {stats.occupiedBeds} / {stats.totalBeds} Beds Occupied
             </span>
           </div>
@@ -287,7 +314,7 @@ export const Dashboard: React.FC = () => {
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#1A2130]">
+            <span className="dashboard-metric-label text-xs font-bold uppercase tracking-wider text-[#1A2130]">
               ICU Critical Care Suites
             </span>
             <HeartPulse
@@ -296,17 +323,17 @@ export const Dashboard: React.FC = () => {
               }`}
             />
           </div>
-          <div className="my-3 flex items-baseline justify-between">
+          <div className="my-3.5 flex items-baseline justify-between">
             <div>
-              <span className="text-3xl font-bold font-mono tabular-nums text-[#1A2130]">
+              <span className="dashboard-metric-value text-3xl font-bold font-mono tabular-nums text-[#1A2130]">
                 {stats.icuAvailable}
               </span>
-              <span className="ml-1.5 text-xs font-bold text-[#1A2130]">
+              <span className="dashboard-metric-label ml-1.5 text-xs font-bold text-[#1A2130]">
                 Available Now
               </span>
             </div>
             <span
-              className={`text-xs font-mono font-bold ${
+              className={`dashboard-metric-label text-xs font-mono font-bold ${
                 isBlossom ? 'text-[#754C68]' : 'text-[#523B9E]'
               }`}
             >
@@ -337,17 +364,17 @@ export const Dashboard: React.FC = () => {
                 : 'border-[#B8C7E0] bg-white hover:border-[#2850C8]'
             }`}
           >
-            <div className="text-xs font-bold text-[#414C66]">
+            <div className="dashboard-metric-label text-xs font-bold text-[#414C66]">
               General &amp; Specialty
             </div>
             <div
-              className={`my-2 text-3xl font-bold font-mono tabular-nums ${
+              className={`dashboard-metric-value my-2 text-3xl font-bold font-mono tabular-nums ${
                 isBlossom ? 'text-[#754C68]' : 'text-[#2850C8]'
               }`}
             >
               {stats.generalAvailable}
             </div>
-            <div className="text-[11px] font-semibold text-[#414C66]">
+            <div className="dashboard-metric-label text-[11px] font-semibold text-[#414C66]">
               Ready of {stats.generalTotal} beds
             </div>
           </div>
@@ -360,7 +387,7 @@ export const Dashboard: React.FC = () => {
                 : 'border-[#F0A79E] bg-[#FFE3D9]/80 hover:border-[#C4382B]'
             }`}
           >
-            <div className="flex items-center justify-between text-xs font-bold text-[#1A2130]">
+            <div className="dashboard-metric-label flex items-center justify-between text-xs font-bold text-[#1A2130]">
               <span>Waiting Queue</span>
               <ClipboardList
                 className={`h-4 w-4 ${
@@ -369,13 +396,13 @@ export const Dashboard: React.FC = () => {
               />
             </div>
             <div
-              className={`my-2 text-3xl font-bold font-mono tabular-nums ${
+              className={`dashboard-metric-value my-2 text-3xl font-bold font-mono tabular-nums ${
                 isBlossom ? 'text-[#754C68]' : 'text-[#B83227]'
               }`}
             >
               {waitingQueue.length}
             </div>
-            <div className="text-[11px] font-semibold text-[#414C66]">
+            <div className="dashboard-metric-label text-[11px] font-semibold text-[#414C66]">
               Priority placement
             </div>
           </div>
@@ -583,6 +610,141 @@ export const Dashboard: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 4B. 7-DAY TREND OF ICU VS. GENERAL WARD OCCUPANCY RATES (LINE CHART) */}
+      <section
+        className={`rounded-3xl border p-6 shadow-xs ${
+          isBlossom
+            ? 'border-[#D9B9C8] bg-[#FFFDFB]'
+            : 'border-[#D5E0F2] bg-white'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h2
+              className={`text-xl font-bold ${
+                isBlossom
+                  ? 'text-[#3D3440] font-editorial'
+                  : 'text-[#252D43] font-display'
+              }`}
+            >
+              7-Day Trend: ICU vs. General Ward Occupancy Rates
+            </h2>
+            <p className="text-xs opacity-75">
+              Rolling 7-day percentage occupancy comparison between high-acuity ICU suites and General &amp; Specialty inpatient wards
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <div
+              className={`rounded-xl border px-3 py-1.5 font-mono font-bold ${
+                isBlossom
+                  ? 'border-[#D9B9C8] bg-[#F5E9E8] text-[#754C68]'
+                  : 'border-[#D5E0F2] bg-[#E9EFF8] text-[#2850C8]'
+              }`}
+            >
+              Live ICU:{' '}
+              {
+                sevenDayOccupancyTrend[sevenDayOccupancyTrend.length - 1]
+                  .icuOccupancy
+              }
+              %
+            </div>
+            <div
+              className={`rounded-xl border px-3 py-1.5 font-mono font-bold ${
+                isBlossom
+                  ? 'border-[#D9B9C8] bg-[#EAE2F3] text-[#3D3440]'
+                  : 'border-[#D5E0F2] bg-[#E8E4FF] text-[#523B9E]'
+              }`}
+            >
+              Live General:{' '}
+              {
+                sevenDayOccupancyTrend[sevenDayOccupancyTrend.length - 1]
+                  .generalOccupancy
+              }
+              %
+            </div>
+          </div>
+        </div>
+
+        <div className="h-64 sm:h-72 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={sevenDayOccupancyTrend}
+              margin={{ top: 10, right: 18, left: -8, bottom: 4 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={isBlossom ? '#EFE2E6' : '#E2E9F5'}
+              />
+              <XAxis
+                dataKey="day"
+                tick={{ fontSize: 11, fill: palette.textMuted }}
+              />
+              <YAxis
+                domain={[0, 100]}
+                unit="%"
+                tick={{ fontSize: 11, fill: palette.textMuted }}
+              />
+              <Tooltip
+                formatter={(value) => `${value ?? 0}%`}
+                contentStyle={{
+                  backgroundColor: palette.tooltipBg,
+                  borderColor: palette.tooltipBorder,
+                  borderRadius: '12px',
+                  color: '#FFFFFF',
+                  fontSize: '12px',
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <ReferenceLine
+                y={85}
+                stroke={isBlossom ? '#B84335' : '#C4382B'}
+                strokeDasharray="4 4"
+                label={{
+                  value: 'Critical Surge Threshold (85%)',
+                  position: 'insideTopRight',
+                  fill: isBlossom ? '#B84335' : '#C4382B',
+                  fontSize: 10,
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="icuOccupancy"
+                name="ICU Ward Occupancy (%)"
+                stroke={isBlossom ? '#754C68' : '#4169E1'}
+                strokeWidth={3}
+                dot={{
+                  r: 4,
+                  fill: isBlossom ? '#754C68' : '#4169E1',
+                  strokeWidth: 2,
+                  stroke: '#FFFFFF',
+                }}
+                activeDot={{ r: 6 }}
+                isAnimationActive={true}
+                animationDuration={650}
+              />
+              <Line
+                type="monotone"
+                dataKey="generalOccupancy"
+                name="General Ward Occupancy (%)"
+                stroke={isBlossom ? '#B98CA7' : '#8975D5'}
+                strokeWidth={2.5}
+                strokeDasharray="6 3"
+                dot={{
+                  r: 3.5,
+                  fill: isBlossom ? '#B98CA7' : '#8975D5',
+                  strokeWidth: 1.5,
+                  stroke: '#FFFFFF',
+                }}
+                activeDot={{ r: 5.5 }}
+                isAnimationActive={true}
+                animationDuration={650}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </section>
 

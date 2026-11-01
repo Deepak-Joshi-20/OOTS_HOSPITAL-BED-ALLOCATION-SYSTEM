@@ -1,522 +1,301 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search,
   Bell,
+  AlertTriangle,
+  HeartPulse,
+  Wrench,
+  BedDouble,
   CheckCircle2,
-  Eye,
-  Plus,
-  X,
-  ArrowUpRight,
+  ArrowRight,
 } from 'lucide-react';
-import { useSystem } from '../context/SystemContext';
-import { AlertPriority, AlertStatus, MaintenanceAlert } from '../types';
-import { EmptyStateIllustration } from '../components/common/ArcticBackground';
+import { useHospital } from '../context/HospitalContext';
+import { useTheme } from '../context/ThemeContext';
+
+interface HospitalAlertItem {
+  id: string;
+  category: 'Critical Placement' | 'Ward Capacity' | 'Bed Sanitization' | 'Equipment Service';
+  severity: 'Urgent' | 'Elevated' | 'Info';
+  title: string;
+  description: string;
+  targetPath: string;
+  actionLabel: string;
+  timestamp: string;
+}
 
 export const Alerts: React.FC = () => {
-  const {
-    alerts,
-    machines,
-    acknowledgeAlert,
-    resolveAlert,
-    createManualAlert,
-  } = useSystem();
+  const { waitingQueue, beds, wards, equipment, updateBedStatus, updateEquipmentStatus } =
+    useHospital();
+  const { isBlossom } = useTheme();
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState<'All' | AlertPriority>('All');
-  const [statusFilter, setStatusFilter] = useState<'All' | AlertStatus>('All');
-  const [machineFilter, setMachineFilter] = useState<string>('All');
-  const [selectedAlert, setSelectedAlert] = useState<MaintenanceAlert | null>(null);
-  const [newAlertOpen, setNewAlertOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<
+    'All' | HospitalAlertItem['category']
+  >('All');
 
-  const [formMachineId, setFormMachineId] = useState(machines[0]?.id || 'H-101');
-  const [formTitle, setFormTitle] = useState('');
-  const [formDesc, setFormDesc] = useState('');
-  const [formPriority, setFormPriority] = useState<AlertPriority>('High');
-  const [formAction, setFormAction] = useState('');
+  const hospitalAlerts = useMemo<HospitalAlertItem[]>(() => {
+    const list: HospitalAlertItem[] = [];
 
-  const priorityRank: Record<AlertPriority, number> = {
-    Critical: 4,
-    High: 3,
-    Medium: 2,
-    Low: 1,
-  };
-
-  const filteredAlerts = useMemo(() => {
-    return alerts
-      .filter((a) => {
-        const q = search.trim().toLowerCase();
-        const matchesSearch =
-          !q ||
-          a.id.toLowerCase().includes(q) ||
-          a.title.toLowerCase().includes(q) ||
-          a.machineName.toLowerCase().includes(q) ||
-          a.description.toLowerCase().includes(q);
-        const matchesPriority =
-          priorityFilter === 'All' || a.priority === priorityFilter;
-        const matchesStatus = statusFilter === 'All' || a.status === statusFilter;
-        const matchesMachine =
-          machineFilter === 'All' || a.machineId === machineFilter;
-        return matchesSearch && matchesPriority && matchesStatus && matchesMachine;
-      })
-      .sort((a, b) => {
-        const pDiff = priorityRank[b.priority] - priorityRank[a.priority];
-        if (pDiff !== 0) return pDiff;
-        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    // 1. Critical & High Acuity Waiting Queue Alerts
+    waitingQueue
+      .filter((w) => w.acuity === 'Critical' || w.acuity === 'High')
+      .forEach((w) => {
+        list.push({
+          id: `ALT-WAIT-${w.id}`,
+          category: 'Critical Placement',
+          severity: w.acuity === 'Critical' ? 'Urgent' : 'Elevated',
+          title: `${w.acuity} Acuity Placement Required · ${w.patientName}`,
+          description: `${w.diagnosis} — Requires ${w.requiredWardType} bed${
+            w.needsVentilator ? ' with Mechanical Ventilator' : ''
+          }${w.needsIsolation ? ' & Isolation Suite' : ''} (Priority Score: ${
+            w.priorityScore
+          }).`,
+          targetPath: '/allocation',
+          actionLabel: 'Open Bed Allocation',
+          timestamp: w.requestedAt,
+        });
       });
-  }, [alerts, search, priorityFilter, statusFilter, machineFilter]);
 
-  const counts = useMemo(() => {
-    return {
-      total: alerts.length,
-      critical: alerts.filter((a) => a.priority === 'Critical' && a.status !== 'Resolved').length,
-      high: alerts.filter((a) => a.priority === 'High' && a.status !== 'Resolved').length,
-      active: alerts.filter((a) => a.status === 'Active').length,
-      resolved: alerts.filter((a) => a.status === 'Resolved').length,
-    };
-  }, [alerts]);
-
-  const handleCreateAlert = (e: React.FormEvent) => {
-    e.preventDefault();
-    const targetMachine = machines.find((m) => m.id === formMachineId);
-    if (!targetMachine || !formTitle.trim()) return;
-
-    createManualAlert({
-      machineId: targetMachine.id,
-      machineName: targetMachine.name,
-      title: formTitle.trim(),
-      description:
-        formDesc.trim() ||
-        `Operator logged ${formPriority.toLowerCase()} maintenance alert for ${targetMachine.name}.`,
-      riskScore: targetMachine.riskScore,
-      priority: formPriority,
-      suggestedAction:
-        formAction.trim() ||
-        'Dispatch reliability technician for physical inspection and sensor verification.',
-      status: 'Active',
+    // 2. High Ward Occupancy Alerts
+    wards.forEach((ward) => {
+      const wardBeds = beds.filter((b) => b.wardId === ward.id);
+      const occupied = wardBeds.filter((b) => b.status === 'Occupied').length;
+      const pct =
+        wardBeds.length > 0 ? Math.round((occupied / wardBeds.length) * 100) : 0;
+      if (pct >= 75) {
+        list.push({
+          id: `ALT-WARD-${ward.id}`,
+          category: 'Ward Capacity',
+          severity: pct >= 85 ? 'Urgent' : 'Elevated',
+          title: `High Ward Occupancy (${pct}%) · ${ward.name}`,
+          description: `${occupied} of ${wardBeds.length} beds currently occupied in ${ward.floor} (${ward.wing}). Coordinate discharges or step-down transfers.`,
+          targetPath: '/wards',
+          actionLabel: 'Inspect Ward Capacity',
+          timestamp: 'Live Telemetry',
+        });
+      }
     });
 
-    setFormTitle('');
-    setFormDesc('');
-    setFormAction('');
-    setNewAlertOpen(false);
-  };
+    // 3. Bed Sanitization & Maintenance Turnover Alerts
+    beds
+      .filter((b) => b.status === 'Cleaning' || b.status === 'Maintenance')
+      .forEach((bed) => {
+        list.push({
+          id: `ALT-BED-${bed.id}`,
+          category: 'Bed Sanitization',
+          severity: bed.status === 'Maintenance' ? 'Elevated' : 'Info',
+          title: `Bed ${bed.bedNumber} (${bed.wardName}) — ${bed.status}`,
+          description: `Unit is currently marked "${bed.status}" (Last sanitized: ${bed.lastSanitized}). Mark available once environmental turnover completes.`,
+          targetPath: '/beds',
+          actionLabel: 'Manage Bed Status',
+          timestamp: bed.lastSanitized,
+        });
+      });
+
+    // 4. Hospital Medical Equipment Calibration & Maintenance Alerts
+    equipment
+      .filter(
+        (eq) =>
+          eq.availability === 'Under Maintenance' ||
+          eq.condition === 'Needs Calibration'
+      )
+      .forEach((eq) => {
+        list.push({
+          id: `ALT-EQ-${eq.id}`,
+          category: 'Equipment Service',
+          severity: 'Elevated',
+          title: `Equipment Service Alert · ${eq.name} (${eq.assetTag})`,
+          description: `Assigned to ${eq.assignedWard} — Status: ${eq.availability}, Condition: ${eq.condition}. Next scheduled calibration: ${eq.nextCalibrationDate}.`,
+          targetPath: '/equipment',
+          actionLabel: 'Review Equipment',
+          timestamp: eq.nextCalibrationDate,
+        });
+      });
+
+    return list;
+  }, [waitingQueue, wards, beds, equipment]);
+
+  const filteredAlerts = useMemo(() => {
+    if (categoryFilter === 'All') return hospitalAlerts;
+    return hospitalAlerts.filter((a) => a.category === categoryFilter);
+  }, [hospitalAlerts, categoryFilter]);
+
+  const cleaningBedsCount = beds.filter((b) => b.status === 'Cleaning').length;
+  const serviceEqCount = equipment.filter(
+    (e) =>
+      e.availability === 'Under Maintenance' ||
+      e.condition === 'Needs Calibration'
+  ).length;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[#E9EAF0] bg-white p-6">
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl p-6 shadow-md border ${
+          isBlossom
+            ? 'bg-gradient-to-r from-[#754C68] via-[#67415B] to-[#4E3145] text-[#FAF1E8] border-[#D9B9C8]/40'
+            : 'bg-gradient-to-r from-[#111A35] to-[#202B52] text-white border-[#4169E1]/30'
+        }`}
+      >
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#252A36] font-display">
-            Maintenance Alerts Centre
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white mb-2">
+            <Bell className="h-3.5 w-3.5" />
+            <span>CLINICAL &amp; HOSPITAL EQUIPMENT ALERTS</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold font-display text-white">
+            Hospital Operational &amp; Equipment Service Alerts
           </h1>
-          <p className="text-xs sm:text-sm text-[#7C8495] mt-1">
-            Prioritize, acknowledge, and resolve equipment maintenance alerts generated by the OS risk pipeline.
+          <p className="text-xs sm:text-sm text-white/85 mt-1 font-medium">
+            Monitor priority ICU bed placement requests, high ward occupancy warnings, sanitization turnover, and biomedical equipment calibration alerts.
           </p>
         </div>
 
-        <button
-          onClick={() => setNewAlertOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#4169E1] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#3457c9] transition-colors self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Log Maintenance Alert</span>
-        </button>
-      </div>
-
-      {/* Summary Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-[#E9EAF0] bg-white p-4">
-          <div className="text-xs text-[#7C8495]">Unresolved Critical</div>
-          <div className="mt-1 text-2xl font-bold font-mono text-[#FF806D] tabular-nums">
-            {counts.critical}
-          </div>
-        </div>
-        <div className="rounded-2xl border border-[#E9EAF0] bg-white p-4">
-          <div className="text-xs text-[#7C8495]">Unresolved High Priority</div>
-          <div className="mt-1 text-2xl font-bold font-mono text-[#8B78DB] tabular-nums">
-            {counts.high}
-          </div>
-        </div>
-        <div className="rounded-2xl border border-[#E9EAF0] bg-white p-4">
-          <div className="text-xs text-[#7C8495]">Active (Unacknowledged)</div>
-          <div className="mt-1 text-2xl font-bold font-mono text-[#4169E1] tabular-nums">
-            {counts.active}
-          </div>
-        </div>
-        <div className="rounded-2xl border border-[#E9EAF0] bg-white p-4">
-          <div className="text-xs text-[#7C8495]">Completed &amp; Resolved</div>
-          <div className="mt-1 text-2xl font-bold font-mono text-[#252A36] tabular-nums">
-            {counts.resolved}
-          </div>
-        </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="rounded-2xl border border-[#E9EAF0] bg-white p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-        <div className="md:col-span-4 relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#7C8495]" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search alert ID, title, or machine..."
-            className="w-full rounded-xl border border-[#E9EAF0] bg-[#F8F7F3] pl-9 pr-3 py-2 text-xs text-[#252A36] focus:border-[#4169E1] focus:bg-white focus:outline-none"
-          />
-        </div>
-
-        <div className="md:col-span-3 flex items-center gap-1 bg-[#F8F7F3] p-1 rounded-xl">
-          {(['All', 'Critical', 'High', 'Medium', 'Low'] as const).map((p) => (
+        <div className="flex flex-wrap items-center gap-2">
+          {cleaningBedsCount > 0 && (
             <button
-              key={p}
-              onClick={() => setPriorityFilter(p)}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                priorityFilter === p
-                  ? 'bg-white text-[#4169E1] font-semibold shadow-2xs'
-                  : 'text-[#7C8495] hover:text-[#252A36]'
-              }`}
+              onClick={() => {
+                beds
+                  .filter((b) => b.status === 'Cleaning')
+                  .forEach((b) => updateBedStatus(b.id, 'Available'));
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 px-3.5 py-2 text-xs font-bold text-white cursor-pointer"
             >
-              {p}
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Complete All Sanitization ({cleaningBedsCount})</span>
             </button>
-          ))}
-        </div>
-
-        <div className="md:col-span-3">
-          <select
-            value={machineFilter}
-            onChange={(e) => setMachineFilter(e.target.value)}
-            className="w-full rounded-xl border border-[#E9EAF0] bg-[#F8F7F3] px-3 py-2 text-xs text-[#252A36] focus:border-[#4169E1] focus:outline-none"
-          >
-            <option value="All">All Monitored Machines</option>
-            {machines.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.id} — {m.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="md:col-span-2">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'All' | AlertStatus)}
-            className="w-full rounded-xl border border-[#E9EAF0] bg-[#F8F7F3] px-3 py-2 text-xs text-[#252A36] focus:border-[#4169E1] focus:outline-none"
-          >
-            <option value="All">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Acknowledged">Acknowledged</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+          )}
+          {serviceEqCount > 0 && (
+            <button
+              onClick={() => {
+                equipment
+                  .filter(
+                    (e) =>
+                      e.availability === 'Under Maintenance' ||
+                      e.condition === 'Needs Calibration'
+                  )
+                  .forEach((e) =>
+                    updateEquipmentStatus(e.id, 'Available', 'Excellent')
+                  );
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#4169E1] hover:bg-[#3256C9] px-3.5 py-2 text-xs font-bold text-white cursor-pointer"
+            >
+              <Wrench className="h-4 w-4" />
+              <span>Clear Equipment Service Alerts ({serviceEqCount})</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Alert Cards List */}
-      {filteredAlerts.length === 0 ? (
-        <div className="rounded-2xl border border-[#E9EAF0] bg-white p-12 text-center space-y-3">
-          <EmptyStateIllustration />
-          <h3 className="text-base font-bold text-[#252A36] font-display">
-            No Maintenance Alerts Found
-          </h3>
-          <p className="text-xs text-[#7C8495] max-w-md mx-auto">
-            No alerts match your current filter selection. Clear filters or simulate high-risk telemetry readings to trigger new alerts.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredAlerts.map((alert) => (
+      {/* Category Filter Pills */}
+      <div className="flex flex-wrap items-center gap-2">
+        {(
+          [
+            'All',
+            'Critical Placement',
+            'Ward Capacity',
+            'Bed Sanitization',
+            'Equipment Service',
+          ] as const
+        ).map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setCategoryFilter(cat)}
+            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+              categoryFilter === cat
+                ? isBlossom
+                  ? 'bg-[#754C68] text-white'
+                  : 'bg-[#111A35] text-white'
+                : 'bg-white border border-[#D5E0F2] text-[#252D43] hover:bg-[#E9EFF8]'
+            }`}
+          >
+            {cat}{' '}
+            {cat === 'All'
+              ? `(${hospitalAlerts.length})`
+              : `(${hospitalAlerts.filter((a) => a.category === cat).length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Alerts List */}
+      <div className="space-y-3">
+        {filteredAlerts.length === 0 ? (
+          <div className="rounded-3xl border border-[#D5E0F2] bg-white p-10 text-center space-y-2">
+            <CheckCircle2 className="h-8 w-8 text-[#4169E1] mx-auto" />
+            <div className="text-sm font-bold text-[#252D43]">
+              No Active Alerts in This Category
+            </div>
+            <p className="text-xs text-[#5A6582]">
+              All hospital wards, patient placements, and medical equipment in this category are operating within normal parameters.
+            </p>
+          </div>
+        ) : (
+          filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className="rounded-2xl border border-[#E9EAF0] bg-white p-5 hover:border-[#63A4FF] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+              className="rounded-2xl border border-[#D5E0F2] bg-white p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
-              <div className="space-y-1.5 max-w-3xl">
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span
-                    className={`font-bold ${
-                      alert.priority === 'Critical'
-                        ? 'text-[#FF806D]'
-                        : alert.priority === 'High'
-                        ? 'text-[#8B78DB]'
-                        : 'text-[#4169E1]'
-                    }`}
-                  >
-                    {alert.priority} Priority
-                  </span>
-                  <span className="text-[#7C8495]">·</span>
-                  <span className="font-mono text-[#7C8495]">{alert.id}</span>
-                  <span className="text-[#7C8495]">·</span>
-                  <button
-                    onClick={() => navigate(`/machines/${alert.machineId}`)}
-                    className="font-semibold text-[#4169E1] hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>
-                      {alert.machineName} ({alert.machineId})
+              <div className="flex items-start gap-3.5">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white ${
+                    alert.severity === 'Urgent'
+                      ? 'bg-[#C4382B]'
+                      : alert.severity === 'Elevated'
+                      ? 'bg-[#5641A6]'
+                      : 'bg-[#4169E1]'
+                  }`}
+                >
+                  {alert.category === 'Critical Placement' ? (
+                    <HeartPulse className="h-5 w-5" />
+                  ) : alert.category === 'Equipment Service' ? (
+                    <Wrench className="h-5 w-5" />
+                  ) : alert.category === 'Bed Sanitization' ? (
+                    <BedDouble className="h-5 w-5" />
+                  ) : (
+                    <AlertTriangle className="h-5 w-5" />
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase ${
+                        alert.severity === 'Urgent'
+                          ? 'bg-[#FFE3D9] text-[#B83227]'
+                          : alert.severity === 'Elevated'
+                          ? 'bg-[#E8E4FF] text-[#523B9E]'
+                          : 'bg-[#E9EFF8] text-[#2850C8]'
+                      }`}
+                    >
+                      {alert.severity} · {alert.category}
                     </span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </button>
-                  <span className="text-[#7C8495]">·</span>
-                  <span className="font-mono text-[#252A36] font-semibold">
-                    Risk {alert.riskScore}/100
-                  </span>
-                  <span className="text-[#7C8495]">·</span>
-                  <span className="text-[#7C8495] font-mono">
-                    {new Date(alert.timestamp).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </div>
-
-                <h3 className="text-sm sm:text-base font-bold text-[#252A36] font-display">
-                  {alert.title}
-                </h3>
-                <p className="text-xs text-[#7C8495] leading-relaxed">
-                  {alert.description}
-                </p>
-                <div className="text-xs text-[#252A36] pt-1">
-                  <span className="font-semibold text-[#4169E1]">
-                    Suggested Action:{' '}
-                  </span>
-                  <span>{alert.suggestedAction}</span>
+                    <span className="font-mono text-[11px] text-[#5A6582]">
+                      {alert.timestamp}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-[#252D43]">
+                    {alert.title}
+                  </h3>
+                  <p className="text-xs text-[#5A6582] leading-relaxed">
+                    {alert.description}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <span className="text-xs font-mono font-semibold text-[#7C8495] mr-2">
-                  Status: {alert.status}
-                </span>
-
-                <button
-                  onClick={() => setSelectedAlert(alert)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#E9EAF0] bg-[#F8F7F3] px-3 py-2 text-xs font-semibold text-[#252A36] hover:bg-[#E9E4FF]"
-                >
-                  <Eye className="h-3.5 w-3.5 text-[#4169E1]" />
-                  <span>Details</span>
-                </button>
-
-                {alert.status === 'Active' && (
-                  <button
-                    onClick={() => acknowledgeAlert(alert.id)}
-                    className="rounded-xl border border-[#E9EAF0] bg-white px-3 py-2 text-xs font-semibold text-[#8B78DB] hover:bg-[#E9E4FF]"
-                  >
-                    Acknowledge
-                  </button>
-                )}
-
-                {alert.status !== 'Resolved' && (
-                  <button
-                    onClick={() => resolveAlert(alert.id)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#4169E1] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#3457c9]"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>Resolve</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Alert Details Modal */}
-      {selectedAlert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252A36]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg rounded-3xl border border-[#E9EAF0] bg-white p-6 sm:p-8 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#E9EAF0] pb-3">
-              <div className="flex items-center gap-2">
-                <Bell className="h-4 w-4 text-[#FF806D]" />
-                <span className="text-xs font-mono font-bold text-[#7C8495]">
-                  {selectedAlert.id} · {selectedAlert.priority} Priority
-                </span>
-              </div>
               <button
-                onClick={() => setSelectedAlert(null)}
-                className="rounded-lg p-1 text-[#7C8495] hover:bg-[#F8F7F3]"
+                onClick={() => navigate(alert.targetPath)}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white shrink-0 self-start sm:self-center cursor-pointer ${
+                  isBlossom
+                    ? 'bg-[#754C68] hover:bg-[#5E3B53]'
+                    : 'bg-[#4169E1] hover:bg-[#3256C9]'
+                }`}
               >
-                <X className="h-5 w-5" />
+                <span>{alert.actionLabel}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
-
-            <h3 className="text-lg font-bold text-[#252A36] font-display">
-              {selectedAlert.title}
-            </h3>
-
-            <div className="rounded-xl bg-[#F8F7F3] p-4 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-[#7C8495]">Target Equipment:</span>
-                <span className="font-semibold text-[#252A36]">
-                  {selectedAlert.machineName} ({selectedAlert.machineId})
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#7C8495]">Calculated Risk Score:</span>
-                <span className="font-mono font-bold text-[#FF806D]">
-                  {selectedAlert.riskScore}/100
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#7C8495]">Current Status:</span>
-                <span className="font-semibold text-[#4169E1]">
-                  {selectedAlert.status}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-1 text-xs">
-              <div className="font-semibold text-[#252A36]">Telemetry Description</div>
-              <p className="text-[#7C8495] leading-relaxed">
-                {selectedAlert.description}
-              </p>
-            </div>
-
-            <div className="space-y-1 text-xs">
-              <div className="font-semibold text-[#252A36]">
-                Recommended Corrective Procedure
-              </div>
-              <p className="text-[#4169E1] leading-relaxed">
-                {selectedAlert.suggestedAction}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E9EAF0]">
-              <button
-                onClick={() => {
-                  const mId = selectedAlert.machineId;
-                  setSelectedAlert(null);
-                  navigate(`/machines/${mId}`);
-                }}
-                className="rounded-xl border border-[#E9EAF0] px-4 py-2 text-xs font-semibold text-[#252A36]"
-              >
-                Inspect Machine
-              </button>
-              {selectedAlert.status !== 'Resolved' && (
-                <button
-                  onClick={() => {
-                    resolveAlert(selectedAlert.id);
-                    setSelectedAlert(null);
-                  }}
-                  className="rounded-xl bg-[#4169E1] px-4 py-2 text-xs font-semibold text-white"
-                >
-                  Mark as Resolved
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Manual Alert Modal */}
-      {newAlertOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#252A36]/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg rounded-3xl border border-[#E9EAF0] bg-white p-6 sm:p-8 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#E9EAF0] pb-3">
-              <h3 className="text-base font-bold text-[#252A36] font-display">
-                Create Maintenance Alert
-              </h3>
-              <button
-                onClick={() => setNewAlertOpen(false)}
-                className="rounded-lg p-1 text-[#7C8495]"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateAlert} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-[#252A36] mb-1">
-                    Machine
-                  </label>
-                  <select
-                    value={formMachineId}
-                    onChange={(e) => setFormMachineId(e.target.value)}
-                    className="w-full rounded-xl border border-[#E9EAF0] bg-white px-3 py-2"
-                  >
-                    {machines.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.id} — {m.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-[#252A36] mb-1">
-                    Priority
-                  </label>
-                  <select
-                    value={formPriority}
-                    onChange={(e) => setFormPriority(e.target.value as AlertPriority)}
-                    className="w-full rounded-xl border border-[#E9EAF0] bg-white px-3 py-2"
-                  >
-                    <option value="Critical">Critical</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-[#252A36] mb-1">
-                  Alert Title
-                </label>
-                <input
-                  type="text"
-                  value={formTitle}
-                  onChange={(e) => setFormTitle(e.target.value)}
-                  placeholder="e.g., Abnormal Harmonic Bearing Resonance"
-                  className="w-full rounded-xl border border-[#E9EAF0] bg-white px-3 py-2"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-[#252A36] mb-1">
-                  Telemetry Observation
-                </label>
-                <textarea
-                  rows={2}
-                  value={formDesc}
-                  onChange={(e) => setFormDesc(e.target.value)}
-                  placeholder="Describe sensor readings or operator observation..."
-                  className="w-full rounded-xl border border-[#E9EAF0] bg-white px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-[#252A36] mb-1">
-                  Suggested Maintenance Action
-                </label>
-                <input
-                  type="text"
-                  value={formAction}
-                  onChange={(e) => setFormAction(e.target.value)}
-                  placeholder="e.g., Inspect shaft coupling and lubricate stage-1 bearing"
-                  className="w-full rounded-xl border border-[#E9EAF0] bg-white px-3 py-2"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setNewAlertOpen(false)}
-                  className="rounded-xl border border-[#E9EAF0] px-4 py-2 font-semibold text-[#7C8495]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-[#4169E1] px-4 py-2 font-semibold text-white"
-                >
-                  Dispatch Alert
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };

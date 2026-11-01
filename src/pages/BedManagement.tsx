@@ -82,11 +82,11 @@ export const BedManagement: React.FC = () => {
       </div>
 
       {/* Ward Tabs & Status Filters */}
-      <div className="rounded-2xl border border-[#D5E0F2] bg-white p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
+      <div className="rounded-2xl border border-[#D5E0F2] bg-white p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 sm:flex-wrap no-scrollbar">
           <button
             onClick={() => setSelectedWardId('ALL')}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+            className={`shrink-0 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
               selectedWardId === 'ALL'
                 ? 'bg-[#111A35] text-white'
                 : 'bg-[#E9EFF8] text-[#252D43] hover:bg-[#E8E4FF]'
@@ -98,7 +98,7 @@ export const BedManagement: React.FC = () => {
             <button
               key={w.id}
               onClick={() => setSelectedWardId(w.id)}
-              className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`shrink-0 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 selectedWardId === w.id
                   ? 'bg-[#4169E1] text-white'
                   : 'bg-[#E9EFF8] text-[#252D43] hover:bg-[#E8E4FF]'
@@ -109,13 +109,13 @@ export const BedManagement: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 sm:flex-wrap no-scrollbar">
           {(['ALL', 'Available', 'Occupied', 'Cleaning', 'Maintenance'] as const).map(
             (st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+                className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                   statusFilter === st
                     ? 'bg-[#8975D5] text-white'
                     : 'bg-[#E9EFF8] text-[#252D43] hover:bg-[#E8E4FF]'
